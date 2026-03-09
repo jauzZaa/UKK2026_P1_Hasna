@@ -21,6 +21,9 @@
     <!-- App Css-->
     <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
 
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v3.0.0/css/line.css">
+
+
 </head>
 
 

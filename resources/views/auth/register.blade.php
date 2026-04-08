@@ -1,52 +1,145 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!doctype html>
+<html lang="en">
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+<!-- Mirrored from preview.pichforest.com/dashonic/layouts/auth-signup-basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 27 Apr 2024 09:53:52 GMT -->
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+<head>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+    <meta charset="utf-8" />
+    <title>Signup | Dashonic - Admin & Dashboard Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Pichforest" name="author" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    <!-- Bootstrap Css -->
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v3.0.0/css/line.css">
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+</head>
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+<body>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    <!-- <body data-layout="horizontal"> -->
+
+    <div class="authentication-bg min-vh-100">
+        <div class="bg-overlay bg-white"></div>
+        <div class="container">
+            <div class="d-flex flex-column min-vh-100 px-3 pt-4">
+                <div class="row justify-content-center my-auto">
+                    <div class="col-md-8 col-lg-6 col-xl-4">
+                        <div class="text-center py-5">
+                            <div class="mb-4 mb-md-5">
+                                <a href="index.html" class="d-block auth-logo">
+                                    <img src="{{ asset('assets/images/logo-dark.png') }}" alt="" height="22" class="auth-logo-dark">
+                                    <img src="{{ asset('assets/images/logo-light.png') }}" alt="" height="22" class="auth-logo-light">
+                                </a>
+                            </div>
+                            <div class="mb-4">
+                                <h5 class="">Register Account</h5>
+                                <p>Get your free Dashonic account now.</p>
+                            </div>
+                            <form action="{{ route('register') }}" method="POST">
+                                @csrf
+                                <div class="form-floating form-floating-custom mb-3">
+                                    <input type="email" class="form-control" id="input-email" placeholder="Enter Email" name="email" value=" {{ old('email') }}">
+                                    @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                    <label for="input-email">Email</label>
+                                    <div class="form-floating-icon">
+                                        <i class="uil uil-envelope-alt"></i>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating form-floating-custom mb-3">
+                                    <input type="text" class="form-control" id="input-username" placeholder="Enter User Name" name="name" value=" {{ old('name') }}">
+                                    @error('name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                    <label for="input-username">Username</label>
+                                    <div class="form-floating-icon">
+                                        <i class="uil uil-users-alt"></i>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-floating form-floating-custom mb-3">
+                                    <input type="password" class="form-control" id="floatingPassword" placeholder="Enter Password" name="password">
+                                    @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                    <label for="floatingPassword">Password</label>
+                                    <div class="form-floating-icon">
+                                        <i class="uil uil-padlock"></i>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating form-floating-custom mb-3">
+                                    <input type="password" class="form-control" id="floatingPassword" placeholder="Enter Confirm Password" name="confirm_password">
+                                    @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                    <label for="floatingPassword">Confirm Password</label>
+                                    <div class="form-floating-icon">
+                                        <i class="uil uil-padlock"></i>
+                                    </div>
+                                </div>
+
+                                <div class="text-start">
+                                    <p>By registering you agree to the Dashonic <a href="#" class="text-decoration-underline">Terms of Use</a></p>
+                                </div>
+
+                                <div class="mt-3">
+                                    <button class="btn btn-info w-100" type="submit">Register</button>
+                                </div>
+                            </form><!-- end form -->
+
+                            <div class="mt-5 text-center">
+                                <p>Already have an account ? <a href="{{ route('login') }}" class="fw-medium text-decoration-underline"> Signin </a></p>
+                            </div>
+                        </div>
+                    </div><!-- end col -->
+                </div><!-- end row -->
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="text-center text-muted p-4">
+                            <p class="mb-0">&copy; <script>
+                                    document.write(new Date().getFullYear())
+                                </script> Dashonic. Crafted with <i class="mdi mdi-heart text-danger"></i> by Pichforest</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- end container -->
+    </div>
+    <!-- end authentication section -->
+
+    <!-- JAVASCRIPT -->
+    <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/metismenujs/metismenujs.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/feather-icons/feather.min.js') }}"></script>
+
+</body>
+
+<!-- Mirrored from preview.pichforest.com/dashonic/layouts/auth-signup-basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 27 Apr 2024 09:53:52 GMT -->
+
+</html>

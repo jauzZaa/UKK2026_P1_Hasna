@@ -49,17 +49,19 @@
                                 <h5>Welcome Back !</h5>
                                 <p>Sign in to continue to Dashonic.</p>
                             </div>
-                            <form>
+                            <form class="form" action="{{ route('login') }}" method="POST">
+                                @csrf
                                 <div class="form-floating form-floating-custom mb-3">
-                                    <input type="text" class="form-control" id="input-username" placeholder="Enter User Name">
-                                    <label for="input-username">Username</label>
+                                    <input type="email" class="form-control" id="input-email" placeholder="Enter Email" name="email" value=" {{ old('email') }}">
+                                    <label for="input-email">Email</label>
                                     <div class="form-floating-icon">
                                         <i class="uil uil-users-alt"></i>
                                     </div>
                                 </div>
+                                
                                 <div class="form-floating form-floating-custom mb-3">
-                                    <input type="password" class="form-control" id="input-password" placeholder="Enter Password">
-                                    <label for="input-password">Password</label>
+                                    <input type="password" class="form-control" id="password" placeholder="Enter Password" name="password">
+                                    <label for="password">Password</label>
                                     <div class="form-floating-icon">
                                         <i class="uil uil-padlock"></i>
                                     </div>
@@ -72,8 +74,9 @@
                                     </label>
                                 </div>
 
+                                 
                                 <div class="mt-3">
-                                    <button class="btn btn-info w-100" type="submit">Log In</button>
+                                    <button type="submit" class="btn btn-info w-100">Log In</button>
                                 </div>
 
                                 <div class="mt-4">
@@ -82,7 +85,7 @@
                             </form><!-- end form -->
 
                             <div class="mt-5 text-center text-muted">
-                                <p>Don't have an account ? <a href="auth-signup-basic.html" class="fw-medium text-decoration-underline"> Signup </a></p>
+                                <p>Don't have an account ? <a href="{{ route('register') }}" class="fw-medium text-decoration-underline"> Signup </a></p>
                             </div>
                         </div>
                     </div><!-- end col -->

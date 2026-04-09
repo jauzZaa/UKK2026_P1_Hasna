@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -10,11 +11,10 @@ class UserController extends Controller
 {
     public function tampil()
     {
-        $data = User::all();
+        $data = User::with('detail')->get();
         return view('user.tampil', compact('data'));
     }
 
-    // ← TAMBAH INI
     public function tambah()
     {
         return view('user.tambah');
@@ -23,23 +23,31 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:users,email',
-            'no_telepon'    => 'nullable|string|max:20',
-            'alamat'        => 'nullable|string|max:500',
-            'tanggal_lahir' => 'nullable|date',
-            'password'      => 'required|min:6',
-            'role'          => 'required|in:admin,petugas,peminjam',
+            'nik'        => 'required|string|unique:user_details,nik',
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email',
+            'no_hp'      => 'nullable|string|max:20',
+            'address'    => 'nullable|string|max:500',
+            'birth_date' => 'nullable|date',
+            'password'   => 'required|min:6',
+            'role'       => 'required|in:Admin,Employee,User',
         ]);
 
-        User::create([
-            'name'          => $request->name,
-            'email'         => $request->email,
-            'no_telepon'    => $request->no_telepon,
-            'alamat'        => $request->alamat,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'password'      => Hash::make($request->password),
-            'role'          => $request->role,
+        // Simpan ke tabel users
+        $user = User::create([
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => $request->role,
+        ]);
+
+        // Simpan ke tabel user_details
+        UserDetail::create([
+            'nik'        => $request->nik,
+            'user_id'    => $user->id,
+            'name'       => $request->name,
+            'no_hp'      => $request->no_hp,
+            'address'    => $request->address,
+            'birth_date' => $request->birth_date,
         ]);
 
         return redirect()->route('user.tampil')->with('success', 'User berhasil ditambahkan!');
@@ -47,7 +55,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('detail')->findOrFail($id);
         return view('user.edit', compact('user'));
     }
 
@@ -56,29 +64,42 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
-            'role'  => 'required',
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email,' . $id,
+            'no_hp'      => 'nullable|string|max:20',
+            'address'    => 'nullable|string|max:500',
+            'birth_date' => 'nullable|date',
+            'role'       => 'required|in:Admin,Employee,User',
         ]);
 
-        $data = [
-            'name'  => $request->name,
+        $user->update([
             'email' => $request->email,
             'role'  => $request->role,
-        ];
+        ]);
 
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $user->update(['password' => Hash::make($request->password)]);
         }
 
-        $user->update($data);
+        // Update atau buat user_details
+        UserDetail::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'name'       => $request->name,
+                'no_hp'      => $request->no_hp,
+                'address'    => $request->address,
+                'birth_date' => $request->birth_date,
+            ]
+        );
 
         return redirect()->route('user.tampil')->with('success', 'User berhasil diupdate!');
     }
 
     public function destroy($id)
     {
-        User::findOrFail($id)->delete();
+        $user = User::findOrFail($id);
+        UserDetail::where('user_id', $user->id)->delete();
+        $user->delete();
         return redirect()->route('user.tampil')->with('success', 'User berhasil dihapus!');
     }
 }

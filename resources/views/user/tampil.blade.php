@@ -7,10 +7,9 @@
 <div class="row">
     <div class="col-12">
         <div class="page-title-box d-flex align-items-center justify-content-between">
-            <h4 class="mb-0">Crud Dasar</h4>
             <div class="page-title-right">
                 <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item active">Tampil | Crud Dasar</li>
+                    <li class="breadcrumb-item active">Tampil | Crud User</li>
                 </ol>
             </div>
         </div>
@@ -22,7 +21,7 @@
     <div class="card">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="card-title mb-0">Tampil Data</h4>
+                <h4 class="card-title mb-0">Tampil Data User</h4>
                 <div>
                     <a href="#" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
@@ -39,6 +38,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
+                            <th>NIK</th>
                             <th>Email</th>
                             <th>Role</th>
                             <th>Aksi</th>
@@ -48,23 +48,27 @@
                         @forelse ($data as $index => $user)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->detail->name ?? '-' }}</td>
+                            <td>{{ $user->detail->nik ?? '-' }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->role ?? '-' }}</td>
                             <td>
                                 <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-warning">
                                     <i class="mdi mdi-pencil"></i> Edit
                                 </a>
-                                <a href="{{ route('user.destroy', $user->id) }}" class="btn btn-sm btn-danger ms-1">
-                                    <i class="mdi mdi-trash-can"></i> Hapus
-                                </a>
+                                <form action="{{ route('user.destroy', $user->id) }}" method="POST" class="d-inline"
+                                    onsubmit="return confirm('Yakin hapus user ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger ms-1">
+                                        <i class="mdi mdi-trash-can"></i> Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-3">
-                                Tidak ada data
-                            </td>
+                            <td colspan="7" class="text-center text-muted py-3">Tidak ada data</td>
                         </tr>
                         @endforelse
                     </tbody>

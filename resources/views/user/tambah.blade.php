@@ -39,6 +39,16 @@
 
             <form action="{{ route('user.store') }}" method="POST">
                 @csrf
+
+                <div class="mb-3">
+                    <label class="form-label">NIK</label>
+                    <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
+                        value="{{ old('nik') }}" placeholder="Masukkan NIK">
+                    @error('nik')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label">Nama</label>
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
@@ -59,38 +69,44 @@
 
                 <div class="mb-3">
                     <label class="form-label">No Telepon</label>
-                    <input type="text" name="no_telepon" class="form-control @error('no_telepon') is-invalid @enderror"
-                        value="{{ old('no_telepon') }}" placeholder="Masukkan no telepon">
-                    @error('no_telepon')
+                    <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror"
+                        value="{{ old('no_hp') }}" placeholder="Masukkan no telepon">
+                    @error('no_hp')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Alamat</label>
-                    <input type="text" name="alamat" class="form-control @error('alamat') is-invalid @enderror"
-                        value="{{ old('alamat') }}" placeholder="Masukkan alamat">
-                    @error('alamat')
+                    <input type="text" name="address" class="form-control @error('address') is-invalid @enderror"
+                        value="{{ old('address') }}" placeholder="Masukkan alamat">
+                    @error('address')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Tanggal Lahir</label>
-                    <input type="date" name="tanggal_lahir" class="form-control @error('tanggal_lahir') is-invalid @enderror"
-                        value="{{ old('tanggal_lahir') }}" placeholder="Masukkan tanggal lahir">
-                    @error('tanggal_lahir')
+                    <input type="date" name="birth_date" class="form-control @error('birth_date') is-invalid @enderror"
+                        value="{{ old('birth_date') }}" placeholder="Masukkan tanggal lahir">
+                    @error('birth_date')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Role</label>
-                    <select name="role" class="form-select @error('role') is-invalid @enderror">
-                        <option value="">--- Pilih Role ---</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="Petugas" {{ old('role') == 'petugas' ? 'selected' : '' }}>Petugas</option>
-                        <option value="Peminjam" {{ old('role') == 'peminjam' ? 'selected' : '' }}>Peminjam</option>
+                    <select name="role" class="form-control" required>
+                        @php
+                        $roles = ['Admin', 'Employee', 'User'];
+                        $current = old('role', $user->role ?? '');
+                        @endphp
+
+                        @foreach ($roles as $r)
+                        <option value="{{ $r }}" {{ $current == $r ? 'selected' : '' }}>
+                            {{ ucfirst($r) }}
+                        </option>
+                        @endforeach
                     </select>
                     @error('role')
                     <div class="invalid-feedback">{{ $message }}</div>

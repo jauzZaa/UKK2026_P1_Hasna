@@ -38,12 +38,42 @@
 
                 <li class="menu-title">Menu</li>
                 <li>
-                    <a href="{{ route('user.tampil') }}" >
+                    <a href="{{ route('user.tampil') }}">
                         <i class="icon nav-icon" data-feather="users"></i>
                         <span class="menu-item">User</span>
                     </a>
-                   
+
                 </li>
+
+                <li>
+                    <a href="{{ route('alat.tampil') }}">
+                        <i class="icon nav-icon" data-feather="package"></i>
+                        <span class="menu-item" data-key="t-ui-elements">Alat</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="apps-kanban-board.html">
+                        <i class="icon nav-icon" data-feather="trello"></i>
+                        <span class="menu-item" data-key="t-kanban">Kategori</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="apps-file-manager.html">
+                        <i class="icon nav-icon" data-feather="folder"></i>
+                        <span class="menu-item" data-key="t-filemanager">Data Peminjaman</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="apps-file-manager.html">
+                        <i class="icon nav-icon" data-feather="folder"></i>
+                        <span class="menu-item" data-key="t-filemanager">Data Pengembalian</span>
+                    </a>
+                </li>
+
+
             </ul>
         </div>
     </div>

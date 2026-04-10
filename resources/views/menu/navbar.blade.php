@@ -53,9 +53,16 @@
                 </li>
 
                 <li>
-                    <a href="apps-kanban-board.html">
+                    <a href="{{ route('category.tampil') }}">
                         <i class="icon nav-icon" data-feather="trello"></i>
                         <span class="menu-item" data-key="t-kanban">Kategori</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('lokasi.tampil') }}">
+                        <i class="icon nav-icon" data-feather="book"></i>
+                        <span class="menu-item" data-key="t-contacts">Lokasi</span>
                     </a>
                 </li>
 

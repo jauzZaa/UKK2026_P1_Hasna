@@ -33,14 +33,12 @@ class UserController extends Controller
             'role'       => 'required|in:Admin,Employee,User',
         ]);
 
-        // Simpan ke tabel users
         $user = User::create([
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
         ]);
 
-        // Simpan ke tabel user_details
         UserDetail::create([
             'nik'        => $request->nik,
             'user_id'    => $user->id,
@@ -64,6 +62,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $request->validate([
+            'nik'        => 'nullable|string|unique:user_details,nik,' . ($user->detail->nik ?? 'NULL') . ',nik',
             'name'       => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email,' . $id,
             'no_hp'      => 'nullable|string|max:20',
@@ -81,16 +80,25 @@ class UserController extends Controller
             $user->update(['password' => Hash::make($request->password)]);
         }
 
-        // Update atau buat user_details
-        UserDetail::updateOrCreate(
-            ['user_id' => $user->id],
-            [
+        $detail = UserDetail::where('user_id', $user->id)->first();
+
+        if ($detail) {
+            $detail->update([
                 'name'       => $request->name,
                 'no_hp'      => $request->no_hp,
                 'address'    => $request->address,
                 'birth_date' => $request->birth_date,
-            ]
-        );
+            ]);
+        } else {
+            UserDetail::create([
+                'nik'        => $request->nik,
+                'user_id'    => $user->id,
+                'name'       => $request->name,
+                'no_hp'      => $request->no_hp,
+                'address'    => $request->address,
+                'birth_date' => $request->birth_date,
+            ]);
+        }
 
         return redirect()->route('user.tampil')->with('success', 'User berhasil diupdate!');
     }

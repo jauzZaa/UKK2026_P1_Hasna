@@ -42,9 +42,18 @@
                 @method('PUT')
 
                 <div class="mb-3">
+                    <label class="form-label">NIK</label>
+                    <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
+                        value="{{ old('nik', $user->detail->nik ?? '') }}" placeholder="Masukkan NIK">
+                    @error('nik')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label">Nama</label>
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                        value="{{ old('name', $user->name) }}" placeholder="Masukkan nama">
+                        value="{{ old('name', $user->detail->name ?? '') }}" placeholder="Masukkan nama">
                     @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -60,22 +69,55 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Password <small class="text-muted">(kosongkan jika tidak diubah)</small></label>
-                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
-                        placeholder="Masukkan password baru">
-                    @error('password')
+                    <label class="form-label">No Telepon</label>
+                    <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror"
+                        value="{{ old('no_hp', $user->detail->no_hp ?? '') }}" placeholder="Masukkan no telepon">
+                    @error('no_hp')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Alamat</label>
+                    <input type="text" name="address" class="form-control @error('address') is-invalid @enderror"
+                        value="{{ old('address', $user->detail->address ?? '') }}" placeholder="Masukkan alamat">
+                    @error('address')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tanggal Lahir</label>
+                    <input type="date" name="birth_date" class="form-control @error('birth_date') is-invalid @enderror"
+                        value="{{ old('birth_date', $user->detail->birth_date ?? '') }}">
+                    @error('birth_date')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Role</label>
-                    <select name="role" class="form-select @error('role') is-invalid @enderror">
-                        <option value="">-- Pilih Role --</option>
-                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
+                    <select name="role" class="form-control @error('role') is-invalid @enderror" required>
+                        @php
+                        $roles = ['Admin', 'Employee', 'User'];
+                        $current = old('role', $user->role ?? '');
+                        @endphp
+                        @foreach ($roles as $r)
+                        <option value="{{ $r }}" {{ $current == $r ? 'selected' : '' }}>
+                            {{ ucfirst($r) }}
+                        </option>
+                        @endforeach
                     </select>
                     @error('role')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password <small class="text-muted">(kosongkan jika tidak diubah)</small></label>
+                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
+                        placeholder="Masukkan password baru">
+                    @error('password')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

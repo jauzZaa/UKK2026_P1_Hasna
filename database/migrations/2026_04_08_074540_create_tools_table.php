@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories');
             $table->string('name', 255)->comment('Nama template/jenis alat');
             $table->enum('item_type', ["single","bundle","bundle_tool"]);
+            $table->bigInteger('price')->default(0)->comment('Harga beli alat');
             $table->text('description')->comment('Deskripsi umum alat atau bundle');
             $table->string('code_slug', 15)->required()->unique();
             $table->string('photo_path', 255)->comment('Path foto representatif alat');

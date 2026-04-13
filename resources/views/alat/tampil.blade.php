@@ -31,22 +31,35 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped table-bordered align-middle">
+                <table class="table table-striped table-bordered align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>No</th>
+                            <th style="width: 45px;"></th>
+                            <th style="width: 50px;">No</th>
                             <th>Foto</th>
                             <th>Kode</th>
                             <th>Nama Alat</th>
                             <th>Kategori</th>
                             <th>Tipe</th>
                             <th>Lokasi</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($data as $index => $alat)
                         <tr>
+                            <td class="text-center">
+                                @if ($alat->item_type == 'bundle' && $alat->bundleItems->count() > 0)
+                                <button class="btn btn-link btn-sm p-0 text-decoration-none"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#row-bundle-{{ $alat->id }}">
+                                    <i class="mdi mdi-chevron-right fw-bold text-info fs-5"></i>
+                                </button>
+                                @else
+                                <span class="text-muted small">•</span>
+                                @endif
+                            </td>
                             <td>{{ $index + 1 }}</td>
                             <td>
                                 @if ($alat->photo_path)
@@ -57,28 +70,22 @@
                                 @endif
                             </td>
                             <td>{{ $alat->code_slug ?? '-' }}</td>
-                            <td>{{ $alat->name }}</td>
+                            <td class="fw-medium">{{ $alat->name }}</td>
                             <td>{{ $alat->category->name ?? '-' }}</td>
                             <td>
                                 @if ($alat->item_type == 'single')
                                 <span class="badge bg-primary">Single</span>
                                 @elseif ($alat->item_type == 'bundle')
                                 <span class="badge bg-info">Bundle</span>
-                                @elseif ($alat->item_type == 'bundle_tool')
-                                <span class="badge bg-secondary">Bundle Tool</span>
-                                @else
-                                <span class="badge bg-light text-dark">-</span>
                                 @endif
                             </td>
                             <td>{{ $alat->lokasi->name ?? '-' }}</td>
-
-
-                            <td>
+                            <td class="text-center">
                                 <a href="{{ route('alat.edit', $alat->id) }}" class="btn btn-sm btn-warning">
                                     <i class="mdi mdi-pencil"></i> Edit
                                 </a>
                                 <form action="{{ route('alat.destroy', $alat->id) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('Yakin hapus alat ini?')">
+                                    onsubmit="return confirm('Yakin hapus alat ini? Seluruh data komponen di dalamnya juga akan terhapus.')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger ms-1">
@@ -90,9 +97,54 @@
                                 </a>
                             </td>
                         </tr>
+
+                        {{-- Baris Detail Komponen --}}
+                        @if ($alat->item_type == 'bundle' && $alat->bundleItems->count() > 0)
+                        <tr class="collapse" id="row-bundle-{{ $alat->id }}">
+                            <td colspan="9" class="bg-light p-0">
+                                <div class="p-4 border-start border-4 border-info ms-2">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="mdi mdi-package-variant-closed fs-4 text-info me-2"></i>
+                                        <h6 class="mb-0 fw-bold text-dark">Detail Komponen Bundle: <span class="text-primary">{{ $alat->name }}</span></h6>
+                                    </div>
+                                    <table class="table table-sm table-hover table-bordered bg-white mb-0 shadow-sm">
+                                        {{-- MENGUBAH TABLE-DARK MENJADI TABLE-LIGHT AGAR TIDAK GELAP --}}
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="text-center" style="width: 50px;">No</th>
+                                                <th>Nama Komponen</th>
+                                                <th>Harga Satuan</th>
+                                                <th class="text-center">Quantity</th>
+                                                <th class="text-end pe-3">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($alat->bundleItems as $subIndex => $item)
+                                            <tr>
+                                                <td class="text-center text-muted">{{ $subIndex + 1 }}</td>
+                                                <td>{{ $item->name ?? '-' }}</td>
+                                                <td>Rp {{ number_format($item->price ?? 0, 0, ',', '.') }}</td>
+                                                <td class="text-center">
+                                                    <span class="badge badge-soft-dark border">{{ $item->pivot->qty }}</span>
+                                                </td>
+                                                <td class="text-end pe-3">
+                                                    Rp {{ number_format(($item->price ?? 0) * $item->pivot->qty, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        @endif
+
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-3">Tidak ada data</td>
+                            <td colspan="9" class="text-center text-muted py-5">
+                                <i class="mdi mdi-database-off fs-1 d-block mb-2"></i>
+                                Tidak ada data alat yang tersedia.
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

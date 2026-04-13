@@ -12,50 +12,44 @@ class ToolUnitController extends Controller
 {
     public function store(Request $request)
     {
-        // 🔍 Validasi
+        // 1. PERBAIKAN VALIDASI: Samakan 'in:...' dengan yang ada di view (Modal Tambah)
         $request->validate([
             'tool_id' => 'required|exists:tools,id',
-            'status' => 'required|in:available,borrowed,maintenance,damaged',
-            'notes' => 'nullable|string'
+            'status'  => 'required|in:available,nonactive,lent', // Sesuaikan pilihan di modal
+            'notes'   => 'nullable|string'
         ]);
 
-        // 🔹 Ambil data tool
         $tool = Alat::findOrFail($request->tool_id);
-
-        // 🔹 Prefix dari tool
         $prefix = $tool->code_slug;
 
-        // 🔹 Cari unit terakhir
+        // 2. LOGIKA GENERATE KODE: Ambil nomor terakhir
         $lastUnit = ToolUnit::where('tool_id', $tool->id)
             ->orderBy('code', 'desc')
             ->first();
 
         if ($lastUnit) {
-
-            // ambil nomor terakhir
+            // Mengambil 3 angka terakhir dari string kode (contoh: ALT-001 -> ambil 001)
             $lastNumber = (int) substr($lastUnit->code, -3);
-
             $newNumber = $lastNumber + 1;
         } else {
-
             $newNumber = 1;
         }
 
-        // 🔹 Format nomor 001
         $number = str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-
         $code = $prefix . '-' . $number;
 
+        // 3. SIMPAN KE DATABASE
         ToolUnit::create([
             'code'       => $code,
             'tool_id'    => $request->tool_id,
             'status'     => $request->status,
             'notes'      => $request->notes,
-            'created_at' => now(),
+            'created_at' => now(), // Karena di model timestamps = false, kita isi manual
         ]);
 
+        // 4. SIMPAN KONDISI AWAL
         UnitCondition::create([
-            'id'          => \Illuminate\Support\Str::uuid(),
+            'id'          => (string) Str::uuid(),
             'unit_code'   => $code,
             'conditions'  => 'good',
             'notes'       => 'Kondisi awal unit',
@@ -68,7 +62,8 @@ class ToolUnitController extends Controller
 
     public function update(Request $request, $code)
     {
-        $unit = ToolUnit::findOrFail($code);
+        // Gunakan find karena primary key adalah string 'code'
+        $unit = ToolUnit::where('code', $code)->firstOrFail();
 
         $request->validate([
             'status' => 'required|in:available,nonactive,lent',
@@ -80,10 +75,9 @@ class ToolUnitController extends Controller
             'notes'  => $request->notes,
         ]);
 
-        // Simpan kondisi baru kalau diisi
         if ($request->filled('conditions')) {
             UnitCondition::create([
-                'id'          => Str::uuid(),
+                'id'          => (string) Str::uuid(),
                 'unit_code'   => $unit->code,
                 'conditions'  => $request->conditions,
                 'notes'       => $request->condition_notes,
@@ -93,17 +87,5 @@ class ToolUnitController extends Controller
 
         return redirect()->route('alat.detail', $unit->tool_id)
             ->with('success', 'Unit berhasil diupdate!');
-    }
-
-    public function destroy($code)
-    {
-        $unit = ToolUnit::findOrFail($code);
-        $tool_id = $unit->tool_id;
-
-        UnitCondition::where('unit_code', $code)->delete();
-        $unit->delete();
-
-        return redirect()->route('alat.detail', $tool_id)
-            ->with('success', 'Unit berhasil dihapus!');
     }
 }

@@ -23,7 +23,7 @@
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    {{-- Card Info Alat --}}
+    <!-- Card Info Alat -->
     <div class="card mb-4">
         <div class="card-body">
             <div class="d-flex align-items-start gap-4">
@@ -86,7 +86,7 @@
         </div>
     </div>
 
-    {{-- Card Daftar Unit --}}
+    <!-- Card Daftar Unit -->
     <div class="card">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -179,7 +179,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Kode Unit </label>
-                        <input type="text" class="form-control bg-light" value="{{ $alat->code_slug }}-{{ str_pad($alat->units->count() + 1, 3, '0', STR_PAD_LEFT) }}" readonly>
+                        <input type="text" name="code" class="form-control bg-light" value="{{ $alat->code_slug }}-{{ str_pad($alat->units->count() + 1, 3, '0', STR_PAD_LEFT) }}" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status</label>

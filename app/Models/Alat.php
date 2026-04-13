@@ -14,6 +14,7 @@ class Alat extends Model
         'location_code',
         'name',
         'item_type',
+        'price',
         'description',
         'code_slug',
         'photo_path',
@@ -33,6 +34,21 @@ class Alat extends Model
     public function units() 
     {
         return $this->hasMany(ToolUnit::class, 'tool_id');
+    }
+
+    public function bundleTools()
+    {
+        return $this->hasMany(BundleTool::class, 'bundle_id');
+    }
+
+    public function bundleItems()
+    {
+        return $this->belongsToMany(
+            Alat::class,
+            'bundle_tools',
+            'bundle_id',
+            'tool_id'
+        )->withPivot('qty');
     }
 
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\AlatController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\ToolUnitController;
+use App\Http\Controllers\PeminjamanController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -61,5 +62,11 @@ Route::get('/alat/detail/{id}', [AlatController::class, 'detail'])->name('alat.d
 Route::post('/unit/store', [ToolUnitController::class, 'store'])->name('unit.store');
 Route::put('/unit/update/{code}', [ToolUnitController::class, 'update'])->name('unit.update');
 Route::delete('/unit/destroy/{code}', [ToolUnitController::class, 'destroy'])->name('unit.destroy');
+
+Route::get('/peminjaman', [PeminjamanController::class, 'tampil'])->name('peminjaman.tampil');
+Route::get('/peminjaman/edit/{id}', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
+Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+Route::delete('/peminjaman/destroy/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+Route::get('/peminjaman/get-unit', [PeminjamanController::class, 'getUnit'])->name('peminjaman.getUnit');
 
 require __DIR__ . '/auth.php';

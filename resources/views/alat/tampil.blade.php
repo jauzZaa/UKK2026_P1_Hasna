@@ -125,7 +125,7 @@
                                                 <td>{{ $item->name ?? '-' }}</td>
                                                 <td>Rp {{ number_format($item->price ?? 0, 0, ',', '.') }}</td>
                                                 <td class="text-center">
-                                                    <span class="badge badge-soft-dark border">{{ $item->pivot->qty }}</span>
+                                                    <span class="badge bg-secondary">{{ $item->pivot->qty }}</span>
                                                 </td>
                                                 <td class="text-end pe-3">
                                                     Rp {{ number_format(($item->price ?? 0) * $item->pivot->qty, 0, ',', '.') }}

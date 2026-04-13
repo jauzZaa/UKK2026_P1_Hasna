@@ -11,7 +11,11 @@ class UserController extends Controller
 {
     public function tampil()
     {
-        $data = User::with('detail')->get();
+        $data = User::with('detail')
+            ->when(request('role'), function ($query) {
+                $query->where('role', request('role'));
+            })
+            ->get();
         return view('user.tampil', compact('data'));
     }
 

@@ -6,6 +6,7 @@ use App\Models\Alat;
 use App\Models\Category;
 use App\Models\Lokasi;
 use App\Models\BundleTool;
+use App\Models\UnitCondition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +14,6 @@ class AlatController extends Controller
 {
     public function tampil()
     {
-        // Filter agar 'bundle_tool' tidak muncul di list utama tabel
         $data = Alat::with(['category', 'lokasi', 'bundleItems'])
             ->where('item_type', '!=', 'bundle_tool')
             ->get();
@@ -64,7 +64,7 @@ class AlatController extends Controller
                     'location_code' => $request->location_code,
                     'name'          => $nama,
                     'item_type'     => 'bundle_tool',
-                    'price'         => $request->bundle_tool_price[$i] ?? 0, // ← harga dari form
+                    'price'         => $request->bundle_tool_price[$i] ?? 0,
                     'description'   => '-',
                     'code_slug'     => $request->code_slug . '-' . ($i + 1),
                     'photo_path'    => $fotoPath,
@@ -84,9 +84,10 @@ class AlatController extends Controller
 
     public function edit($id)
     {
-        $alat     = Alat::with('bundleTools.tool')->findOrFail($id);
+        $alat     = Alat::with('bundleItems')->findOrFail($id);
         $kategori = Category::all();
         $lokasi   = Lokasi::all();
+
         return view('alat.edit', compact('alat', 'kategori', 'lokasi'));
     }
 
@@ -94,53 +95,113 @@ class AlatController extends Controller
     {
         $alat = Alat::findOrFail($id);
 
-        $request->validate([
-            'category_id'   => 'required|exists:categories,id',
-            'location_code' => 'nullable|exists:locations,location_code',
-            'name'          => 'required|string|max:255',
-            'item_type'     => 'required|in:single,bundle,bundle_tool',
-            'price'         => 'required|integer|min:0',
-            'description'   => 'nullable|string',
-            'code_slug'     => 'required|string|max:15|unique:tools,code_slug,' . $id,
-            'photo_path'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $data = $request->only([
-            'category_id',
-            'location_code',
-            'name',
-            'item_type',
-            'price',
-            'description',
-            'code_slug',
+        $alat->update([
+            'category_id'   => $request->category_id,
+            'location_code' => $request->location_code,
+            'name'          => $request->name,
+            'price'         => $request->price,
+            'description'   => $request->description,
+            'item_type'     => $request->item_type,
         ]);
 
         if ($request->hasFile('photo_path')) {
-            if ($alat->photo_path && Storage::disk('public')->exists($alat->photo_path)) {
+            if ($alat->photo_path) {
                 Storage::disk('public')->delete($alat->photo_path);
             }
-            $data['photo_path'] = $request->file('photo_path')->store('alat', 'public');
+            $alat->photo_path = $request->file('photo_path')->store('alat', 'public');
+            $alat->save();
         }
 
-        $alat->update($data);
+        if ($request->item_type == 'bundle' && $request->has('bundle_names')) {
 
-        return redirect()->route('alat.tampil')->with('success', 'Alat berhasil diupdate!');
+            BundleTool::where('bundle_id', $alat->id)->delete();
+
+            foreach ($request->bundle_names as $key => $name) {
+                if (!$name) continue;
+
+                $subSlug = $alat->code_slug . '-sub-' . ($key + 1);
+                $subAlat = Alat::where('code_slug', $subSlug)->first();
+
+                if ($subAlat) {
+                    $subAlat->update([
+                        'name'          => $name,
+                        'price'         => $request->bundle_prices[$key] ?? 0,
+                        'category_id'   => $alat->category_id,
+                        'location_code' => $alat->location_code,
+                        'photo_path'    => $alat->photo_path,
+                        'description'   => '-',
+                    ]);
+                } else {
+                    $subAlat = Alat::create([
+                        'name'          => $name,
+                        'item_type'     => 'bundle_tool',
+                        'category_id'   => $alat->category_id,
+                        'location_code' => $alat->location_code,
+                        'price'         => $request->bundle_prices[$key] ?? 0,
+                        'description'   => '-',
+                        'code_slug'     => $subSlug,
+                        'photo_path'    => $alat->photo_path,
+                        'created_at'    => now(),
+                    ]);
+                }
+
+                BundleTool::create([
+                    'bundle_id' => $alat->id,
+                    'tool_id'   => $subAlat->id,
+                    'qty'       => $request->bundle_qtys[$key] ?? 1,
+                ]);
+            }
+        }
+
+        return redirect()->route('alat.tampil')->with('success', 'Data berhasil diperbarui!');
+    }
+
+    /**
+     * Helper: hapus unit_conditions lalu tool_units untuk satu alat
+     */
+    private function hapusUnits(Alat $alat)
+    {
+        $alat->load('units');
+        foreach ($alat->units as $unit) {
+            // Hapus unit_conditions dulu (FK ke tool_units)
+            UnitCondition::where('unit_code', $unit->code)->delete();
+        }
+        // Baru hapus tool_units
+        $alat->units()->delete();
     }
 
     public function destroy($id)
     {
-        $alat = Alat::findOrFail($id);
+        $alat = Alat::with('bundleItems')->findOrFail($id);
 
-        \App\Models\BundleTool::where('bundle_id', $id)
-            ->orWhere('tool_id', $id)
-            ->delete();
+       
+        BundleTool::where('bundle_id', $id)->delete();
 
-        // 3. Hapus foto jika ada
+        
+        if ($alat->item_type === 'bundle') {
+            foreach ($alat->bundleItems as $subAlat) {
+                // Hapus bundle_tools yang mereferensikan sub-alat
+                BundleTool::where('bundle_id', $subAlat->id)
+                    ->orWhere('tool_id', $subAlat->id)
+                    ->delete();
+                // Hapus unit_conditions → tool_units → sub-alat
+                $this->hapusUnits($subAlat);
+                $subAlat->delete();
+            }
+        }
+
+       
+        BundleTool::where('tool_id', $id)->delete();
+
+       
+        $this->hapusUnits($alat);
+
+        // 5. Hapus foto
         if ($alat->photo_path && Storage::disk('public')->exists($alat->photo_path)) {
             Storage::disk('public')->delete($alat->photo_path);
         }
 
-        // 4. Baru hapus data alat utamanya
+        
         $alat->delete();
 
         return redirect()->route('alat.tampil')->with('success', 'Alat dan relasinya berhasil dihapus!');

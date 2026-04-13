@@ -56,14 +56,10 @@
 
                         <div class="mb-3">
                             <label class="form-label">Tipe Item <span class="text-danger">*</span></label>
-                            <select name="item_type" id="item_type"
-                                class="form-control @error('item_type') is-invalid @enderror" required>
-                                <option value="single" {{ old('item_type', $alat->item_type) == 'single' ? 'selected' : '' }}>Single</option>
-                                <option value="bundle" {{ old('item_type', $alat->item_type) == 'bundle' ? 'selected' : '' }}>Bundle</option>
+                            <select name="item_type" id="item_type" class="form-control" required>
+                                <option value="single" {{ $alat->item_type == 'single' ? 'selected' : '' }}>Single</option>
+                                <option value="bundle" {{ $alat->item_type == 'bundle' ? 'selected' : '' }}>Bundle</option>
                             </select>
-                            @error('item_type')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="mb-3">
@@ -128,38 +124,44 @@
                     </div>
                 </div>
 
-                {{-- BUNDLE SECTION (Read Only dengan Warna Default) --}}
                 @if($alat->item_type == 'bundle')
                 <hr class="my-4">
                 <div id="bundleSection">
-                    <div class="alert alert-light border d-flex align-items-center shadow-sm mb-4">
-                        <i class="mdi mdi-information-outline text-info me-2 fs-4"></i>
-                        <div class="text-muted">Data isi bundle bersifat permanen dan tidak dapat diubah di sini.</div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Isi Bundle Alat</h5>
+                        <button type="button" class="btn btn-sm btn-primary" id="addBundleItem">
+                            <i class="mdi mdi-plus"></i> Tambah Baris
+                        </button>
                     </div>
 
-                    <h5 class="mb-3">Isi Bundle Alat</h5>
                     <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            {{-- Header Default (Abu-abu sangat muda khas Bootstrap) --}}
+                        <table class="table table-bordered align-middle" id="bundleTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="py-3">Nama Sub-Alat</th>
-                                    <th class="py-3" style="width: 100px;">Qty</th>
-                                    <th class="py-3" style="width: 200px;">Harga Satuan</th>
-
+                                    <th>Nama Sub-Alat</th>
+                                    <th style="width: 120px;">Qty</th>
+                                    <th style="width: 200px;">Harga Satuan (Rp)</th>
+                                    <th style="width: 50px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($alat->bundleItems as $item)
                                 <tr>
-                                    <td class="fw-semibold">{{ $item->name }}</td>
-                                    <td>{{ $item->pivot->qty }}</td>
-                                    <td>Rp {{ number_format($item->price, 0, ',', '.') }}</td>
-
+                                    <td>
+                                        <input type="text" name="bundle_names[]" class="form-control" value="{{ $item->name }}" placeholder="Nama alat..." required>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="bundle_qtys[]" class="form-control" value="{{ $item->pivot->qty }}" min="1" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="bundle_prices[]" class="form-control" value="{{ $item->price }}" placeholder="Harga..." required>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-sm remove-row"><i class="mdi mdi-trash-can"></i></button>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
-
                         </table>
                     </div>
                 </div>
@@ -179,21 +181,32 @@
 </div>
 
 <script>
-    // Format harga utama
-    const priceDisplay = document.getElementById('priceDisplay');
-    const priceValue = document.getElementById('priceValue');
-    priceDisplay.addEventListener('input', function() {
-        let raw = this.value.replace(/\D/g, '');
-        priceValue.value = raw || 0;
-        this.value = raw ? parseInt(raw).toLocaleString('id-ID') : '';
+    // Script untuk menambah baris bundle secara manual
+    document.getElementById('addBundleItem')?.addEventListener('click', function() {
+        const tableBody = document.querySelector('#bundleTable tbody');
+        const newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+            <td>
+                <input type="text" name="bundle_names[]" class="form-control" placeholder="Nama alat..." required>
+            </td>
+            <td>
+                <input type="number" name="bundle_qtys[]" class="form-control" value="1" min="1" required>
+            </td>
+            <td>
+                <input type="number" name="bundle_prices[]" class="form-control" placeholder="Harga..." required>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-row"><i class="mdi mdi-trash-can"></i></button>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
     });
 
-    // Preview foto baru
-    document.getElementById('inputFoto').addEventListener('change', function() {
-        const preview = document.getElementById('previewFoto');
-        if (this.files && this.files[0]) {
-            preview.src = URL.createObjectURL(this.files[0]);
-            preview.classList.remove('d-none');
+    // Delegasi event untuk hapus baris
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-row')) {
+            e.target.closest('tr').remove();
         }
     });
 </script>

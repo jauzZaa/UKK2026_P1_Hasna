@@ -19,6 +19,20 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/dashboard', function () {
+    $role = strtolower(auth()->user()->role);
+
+    if ($role == 'admin') {
+        return view('dashboard');
+    } elseif ($role == 'employee') {
+        return view('dashboard');
+    } elseif ($role == 'user') {
+        return redirect()->route('alat.tampil');
+    }
+
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
 Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
 Route::post('/register', [RegisteredUserController::class, 'store']);
@@ -64,9 +78,11 @@ Route::put('/unit/update/{code}', [ToolUnitController::class, 'update'])->name('
 Route::delete('/unit/destroy/{code}', [ToolUnitController::class, 'destroy'])->name('unit.destroy');
 
 Route::get('/peminjaman', [PeminjamanController::class, 'tampil'])->name('peminjaman.tampil');
-Route::get('/peminjaman/edit/{id}', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
-Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
-Route::delete('/peminjaman/destroy/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
-Route::get('/peminjaman/get-unit', [PeminjamanController::class, 'getUnit'])->name('peminjaman.getUnit');
+Route::get('/peminjaman/tambah', [PeminjamanController::class, 'tambah'])->name('peminjaman.tambah');
+Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
+Route::get('/peminjaman/units/{toolId}', [PeminjamanController::class, 'getUnits'])->name('peminjaman.units');
+Route::patch('/peminjaman/{peminjaman}/approve', [PeminjamanController::class, 'approve'])->name('peminjaman.approve');
+Route::patch('/peminjaman/{peminjaman}/reject', [PeminjamanController::class, 'reject'])->name('peminjaman.reject');
+Route::get('/riwayat', [PeminjamanController::class, 'riwayat'])->name('peminjaman.riwayat');
 
 require __DIR__ . '/auth.php';

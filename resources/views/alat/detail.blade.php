@@ -3,6 +3,9 @@
 @section('title', 'Detail Alat')
 
 @section('content')
+
+@php $role = strtolower(auth()->user()->role); @endphp
+
 <div class="row">
     <div class="col-12">
         <div class="page-title-box d-flex align-items-center justify-content-between">
@@ -91,9 +94,11 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0">Daftar Unit Alat</h4>
+                @if($role == 'admin')
                 <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalTambahUnit">
                     <i class="mdi mdi-plus"></i> Tambah Unit
                 </button>
+                @endif
             </div>
 
             <div class="table-responsive">
@@ -105,7 +110,9 @@
                             <th>Status</th>
                             <th>Kondisi</th>
                             <th>Catatan</th>
+                            @if($role == 'admin')
                             <th>Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -126,6 +133,7 @@
                             </td>
                             <td>{{ $unit->latestCondition->conditions ?? '-' }}</td>
                             <td>{{ $unit->notes ?? '-' }}</td>
+                            @if($role == 'admin')
                             <td>
                                 <button type="button" class="btn btn-sm btn-warning"
                                     data-bs-toggle="modal"
@@ -146,10 +154,11 @@
                                     </button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-3">Belum ada unit untuk alat ini</td>
+                            <td colspan="{{ $role == 'admin' ? 6 : 5 }}" class="text-center text-muted py-3">Belum ada unit untuk alat ini</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -165,6 +174,7 @@
     </div>
 </div>
 
+@if($role == 'admin')
 <!-- Modal Tambah Unit -->
 <div class="modal fade" id="modalTambahUnit" tabindex="-1">
     <div class="modal-dialog">
@@ -178,8 +188,9 @@
                 <input type="hidden" name="tool_id" value="{{ $alat->id }}">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Kode Unit </label>
-                        <input type="text" name="code" class="form-control bg-light" value="{{ $alat->code_slug }}-{{ str_pad($alat->units->count() + 1, 3, '0', STR_PAD_LEFT) }}" readonly>
+                        <label class="form-label">Kode Unit</label>
+                        <input type="text" name="code" class="form-control bg-light"
+                            value="{{ $alat->code_slug }}-{{ str_pad($alat->units->count() + 1, 3, '0', STR_PAD_LEFT) }}" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Status</label>
@@ -278,5 +289,6 @@
         document.getElementById('formEditUnit').action = '/unit/update/' + code;
     });
 </script>
+@endif
 
 @endsection

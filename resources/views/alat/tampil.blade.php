@@ -15,6 +15,8 @@
     </div>
 </div>
 
+@php $role = strtolower(auth()->user()->role); @endphp
+
 <div class="col-lg-12">
     <div class="card">
         <div class="card-body">
@@ -24,9 +26,11 @@
                     <a href="#" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
                     </a>
+                    @if($role == 'admin')
                     <a href="{{ route('alat.tambah') }}" class="btn btn-sm btn-primary ms-2">
                         Tambah <i class="mdi mdi-plus align-middle"></i>
                     </a>
+                    @endif
                 </div>
             </div>
 
@@ -81,6 +85,7 @@
                             </td>
                             <td>{{ $alat->lokasi->name ?? '-' }}</td>
                             <td class="text-center">
+                                @if($role == 'admin')
                                 <a href="{{ route('alat.edit', $alat->id) }}" class="btn btn-sm btn-warning">
                                     <i class="mdi mdi-pencil"></i> Edit
                                 </a>
@@ -92,13 +97,13 @@
                                         <i class="mdi mdi-trash-can"></i> Hapus
                                     </button>
                                 </form>
+                                @endif
                                 <a href="{{ route('alat.detail', $alat->id) }}" class="btn btn-sm btn-info ms-1">
                                     <i class="mdi mdi-eye"></i> Detail
                                 </a>
                             </td>
                         </tr>
 
-                        {{-- Baris Detail Komponen --}}
                         @if ($alat->item_type == 'bundle' && $alat->bundleItems->count() > 0)
                         <tr class="collapse" id="row-bundle-{{ $alat->id }}">
                             <td colspan="9" class="bg-light p-0">
@@ -108,7 +113,6 @@
                                         <h6 class="mb-0 fw-bold text-dark">Detail Komponen Bundle: <span class="text-primary">{{ $alat->name }}</span></h6>
                                     </div>
                                     <table class="table table-sm table-hover table-bordered bg-white mb-0 shadow-sm">
-                                        {{-- MENGUBAH TABLE-DARK MENJADI TABLE-LIGHT AGAR TIDAK GELAP --}}
                                         <thead class="table-light">
                                             <tr>
                                                 <th class="text-center" style="width: 50px;">No</th>

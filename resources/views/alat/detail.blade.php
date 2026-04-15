@@ -158,7 +158,9 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="{{ $role == 'admin' ? 6 : 5 }}" class="text-center text-muted py-3">Belum ada unit untuk alat ini</td>
+                            <td colspan="{{ $role == 'admin' ? 6 : 5 }}" class="text-center text-muted py-3">
+                                Belum ada unit untuk alat ini
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

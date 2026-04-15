@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Storage;
 class AlatController extends Controller
 {
     public function tampil()
+
     {
+        
         $data = Alat::with(['category', 'lokasi', 'bundleItems'])
             ->where('item_type', '!=', 'bundle_tool')
             ->get();

@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\ToolUnitController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -85,4 +86,16 @@ Route::patch('/peminjaman/{peminjaman}/approve', [PeminjamanController::class, '
 Route::patch('/peminjaman/{peminjaman}/reject', [PeminjamanController::class, 'reject'])->name('peminjaman.reject');
 Route::get('/riwayat', [PeminjamanController::class, 'riwayat'])->name('peminjaman.riwayat');
 
+Route::patch('/peminjaman/{peminjaman}/update', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+Route::delete('/peminjaman/{peminjaman}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+
+Route::patch('/peminjaman/{peminjaman}/ajukan-kembali', [PengembalianController::class, 'ajukan'])->name('pengembalian.ajukan');
+
+
+Route::get('/pengembalian', [PengembalianController::class, 'index'])->name('petugas.pengembalian');
+Route::patch('/pengembalian/{peminjaman}/ajukan',[PengembalianController::class, 'ajukan'])->name('pengembalian.ajukan');
+Route::patch('/pengembalian/{peminjaman}/konfirmasi', [PengembalianController::class, 'konfirmasi'])
+    ->name('pengembalian.konfirmasi');
+Route::get('/pengembalian/riwayat', [PengembalianController::class, 'riwayat'])
+    ->name('pengembalian.riwayat');
 require __DIR__ . '/auth.php';

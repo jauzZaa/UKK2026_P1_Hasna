@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('unit_code')->references('code')->on('tool_units');
             $table->integer('employee_id')->nullable()->comment('FK ke users   (  Employee  )    ,   diisi saat approve atau reject');
             $table->foreign('employee_id')->references('id')->on('users');
-            $table->enum('status', ["pending","active","rejected","closed"]);
+            $table->enum('status', ["pending","active","rejected","closed", "returning" ]);
             $table->date('loan_date')->comment('Tanggal mulai peminjaman');
             $table->date('due_date')->comment('Tanggal wajib kembali');
             $table->text('purpose')->comment('Tujuan/keperluan peminjaman dari user');

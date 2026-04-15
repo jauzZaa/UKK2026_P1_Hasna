@@ -11,15 +11,17 @@ use Illuminate\Support\Facades\Auth;
 class PeminjamanController extends Controller
 {
     public function tampil()
-    {
-        $status = request('status', 'all');
-        $data = Peminjaman::with(['alat', 'unit', 'user.detail'])
-            ->when($status !== 'all', fn($q) => $q->where('status', $status))
-            ->orderByDesc('created_at')
-            ->paginate(15);
+{
+    $status = request('status', 'all');
+    $data = Peminjaman::with(['alat', 'unit', 'user.detail'])
+        ->when($status !== 'all', fn($q) => $q->where('status', $status))
+        ->orderByDesc('created_at')
+        ->paginate(15);
 
-        return view('peminjaman.tampil', compact('data'));
-    }
+    $alat = Alat::orderBy('name')->get(); // tambah ini
+
+    return view('peminjaman.tampil', compact('data', 'alat')); // tambah 'alat'
+}
 
     public function tambah()
     {
@@ -111,5 +113,49 @@ class PeminjamanController extends Controller
             ->paginate(15);
 
         return view('peminjaman.riwayat', compact('data'));
+    }
+
+    public function update(Request $request, Peminjaman $peminjaman)
+    {
+        abort_if(Auth::user()->role !== 'Admin', 403);
+
+        $request->validate([
+            'tool_id'   => 'required|exists:tools,id',
+            'unit_code' => 'required|exists:tool_units,code',
+            'loan_date' => 'required|date',
+            'due_date'  => 'required|date|after:loan_date',
+            'purpose'   => 'required|string|max:500',
+            'status'    => 'required|in:pending,active,rejected,closed',
+            'notes'     => 'nullable|string|max:1000',
+        ]);
+
+        $peminjaman->update($request->only([
+            'tool_id',
+            'unit_code',
+            'loan_date',
+            'due_date',
+            'purpose',
+            'status',
+            'notes'
+        ]));
+
+        return redirect()->route('peminjaman.tampil')
+            ->with('success', 'Data peminjaman berhasil diperbarui.');
+    }
+
+    public function destroy(Peminjaman $peminjaman)
+    {
+        abort_if(Auth::user()->role !== 'Admin', 403);
+
+        // Bebaskan unit jika masih dipinjam
+        if ($peminjaman->status === 'active') {
+            ToolUnit::where('code', $peminjaman->unit_code)
+                ->update(['status' => 'available']);
+        }
+
+        $peminjaman->delete();
+
+        return redirect()->route('peminjaman.tampil')
+            ->with('success', 'Data peminjaman berhasil dihapus.');
     }
 }

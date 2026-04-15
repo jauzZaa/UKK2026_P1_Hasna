@@ -65,17 +65,19 @@
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('peminjaman.*') ? 'mm-active' : '' }}">
-                    <a href="#" class="{{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">
+                    <a href="{{ route('peminjaman.tampil') }}"
+                        class="{{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">
                         <i class="icon nav-icon" data-feather="folder"></i>
                         <span class="menu-item">Data Peminjaman</span>
                     </a>
                 </li>
-                <li>
-                    <a href="#">
+                <!-- <li class="{{ request()->routeIs('petugas.pengembalian.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('petugas.pengembalian') }}"
+                        class="{{ request()->routeIs('petugas.pengembalian.*') ? 'active' : '' }}">
                         <i class="icon nav-icon" data-feather="folder"></i>
                         <span class="menu-item">Data Pengembalian</span>
                     </a>
-                </li>
+                </li> -->
                 @endif
 
                 @if($role == 'employee')
@@ -86,6 +88,21 @@
                         <span class="menu-item">Pengajuan</span>
                     </a>
                 </li>
+                <li class="{{ request()->routeIs('petugas.pengembalian') ? 'mm-active' : '' }}">
+                    <a href="{{ route('petugas.pengembalian') }}"
+                        class="{{ request()->routeIs('petugas.pengembalian') ? 'active' : '' }}">
+                        <i class="icon nav-icon" data-feather="corner-down-left"></i>
+                        <span class="menu-item">Pengembalian</span>
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('pengembalian.riwayat') ? 'mm-active' : '' }}">
+                    <a href="{{ route('pengembalian.riwayat') }}"
+                        class="{{ request()->routeIs('pengembalian.riwayat') ? 'active' : '' }}">
+                        <i class="icon nav-icon" data-feather="file-text"></i>
+                        <span class="menu-item">Riwayat</span>
+                    </a>
+                </li>
+
                 @endif
 
                 @if($role == 'user')

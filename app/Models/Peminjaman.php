@@ -50,8 +50,8 @@ class Peminjaman extends Model
         return $this->belongsTo(User::class, 'employee_id');
     }
 
-    // public function pengembalian()
-    // {
-    //     return $this->hasOne(Pengembalian::class, 'loan_id');
-    // }
+    public function pengembalian()
+    {
+         return $this->hasOne(Pengembalian::class, 'loan_id');
+     }
 }

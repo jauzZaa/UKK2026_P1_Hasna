@@ -22,7 +22,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0">Ajukan Peminjaman</h4>
-                <a href="{{ route('peminjaman.tampil') }}" class="btn btn-sm btn-secondary-subtle">
+                <a href="#" class="btn btn-sm btn-secondary-subtle">
                     <i class="mdi mdi-arrow-left"></i> Kembali
                 </a>
             </div>
@@ -42,7 +42,6 @@
 
                 <div class="row g-3">
 
-                    {{-- KOLOM KIRI --}}
                     <div class="col-md-6">
 
                         <div class="mb-3">

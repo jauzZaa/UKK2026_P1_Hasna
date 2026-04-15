@@ -49,7 +49,7 @@ class PeminjamanController extends Controller
             'loan_date'  => 'required|date|after_or_equal:today',
             'due_date'   => 'required|date|after:loan_date',
             'purpose'    => 'required|string|max:500',
-            'user_notes' => 'nullable|string|max:1000',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         Peminjaman::create([
@@ -60,7 +60,7 @@ class PeminjamanController extends Controller
             'loan_date'  => $request->loan_date,
             'due_date'   => $request->due_date,
             'purpose'    => $request->purpose,
-            'user_notes' => $request->user_notes,
+            'notes' => $request->notes,
             'created_at' => now(),
         ]);
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 
@@ -26,11 +27,14 @@ class LokasiController extends Controller
             'detail'        => 'nullable|string|max:100',
         ]);
 
-        Lokasi::create([
+        $lokasi = Lokasi::create([
             'location_code' => $request->location_code,
             'name'          => $request->name,
             'detail'        => $request->detail,
         ]);
+
+        // ← LOG
+        ActivityLog::log('create', 'lokasi', "Menambah lokasi: {$lokasi->name} ({$lokasi->location_code})");
 
         return redirect()->route('lokasi.tampil')->with('success', 'Lokasi berhasil ditambahkan!');
     }
@@ -55,12 +59,20 @@ class LokasiController extends Controller
             'detail' => $request->detail,
         ]);
 
+        
+        ActivityLog::log('update', 'lokasi', "Mengubah lokasi: {$lokasi->name} ({$lokasi->location_code})");
+
         return redirect()->route('lokasi.tampil')->with('success', 'Lokasi berhasil diupdate!');
     }
 
     public function destroy($location_code)
     {
-        Lokasi::findOrFail($location_code)->delete();
+        $lokasi = Lokasi::findOrFail($location_code);
+
+        // ← LOG (sebelum delete)
+        ActivityLog::log('delete', 'lokasi', "Menghapus lokasi: {$lokasi->name} ({$lokasi->location_code})");
+
+        $lokasi->delete();
         return redirect()->route('lokasi.tampil')->with('success', 'Lokasi berhasil dihapus!');
     }
 }

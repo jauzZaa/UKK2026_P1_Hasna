@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alat;
+use App\Models\ActivityLog;
 use App\Models\Category;
 use App\Models\Lokasi;
 use App\Models\BundleTool;
@@ -13,13 +14,10 @@ use Illuminate\Support\Facades\Storage;
 class AlatController extends Controller
 {
     public function tampil()
-
     {
-        
         $data = Alat::with(['category', 'lokasi', 'bundleItems'])
             ->where('item_type', '!=', 'bundle_tool')
             ->get();
-
         return view('alat.tampil', compact('data'));
     }
 
@@ -60,7 +58,6 @@ class AlatController extends Controller
         if ($request->item_type === 'bundle' && $request->bundle_tool_name) {
             foreach ($request->bundle_tool_name as $i => $nama) {
                 if (!$nama) continue;
-
                 $subAlat = Alat::create([
                     'category_id'   => $request->category_id,
                     'location_code' => $request->location_code,
@@ -72,7 +69,6 @@ class AlatController extends Controller
                     'photo_path'    => $fotoPath,
                     'created_at'    => now(),
                 ]);
-
                 BundleTool::create([
                     'bundle_id' => $alat->id,
                     'tool_id'   => $subAlat->id,
@@ -80,6 +76,9 @@ class AlatController extends Controller
                 ]);
             }
         }
+
+        // ← LOG
+        ActivityLog::log('create', 'alat', "Menambah alat: {$alat->name} (Tipe: {$alat->item_type})");
 
         return redirect()->route('alat.tampil')->with('success', 'Alat berhasil ditambahkan!');
     }
@@ -89,7 +88,6 @@ class AlatController extends Controller
         $alat     = Alat::with('bundleItems')->findOrFail($id);
         $kategori = Category::all();
         $lokasi   = Lokasi::all();
-
         return view('alat.edit', compact('alat', 'kategori', 'lokasi'));
     }
 
@@ -107,23 +105,17 @@ class AlatController extends Controller
         ]);
 
         if ($request->hasFile('photo_path')) {
-            if ($alat->photo_path) {
-                Storage::disk('public')->delete($alat->photo_path);
-            }
+            if ($alat->photo_path) Storage::disk('public')->delete($alat->photo_path);
             $alat->photo_path = $request->file('photo_path')->store('alat', 'public');
             $alat->save();
         }
 
         if ($request->item_type == 'bundle' && $request->has('bundle_names')) {
-
             BundleTool::where('bundle_id', $alat->id)->delete();
-
             foreach ($request->bundle_names as $key => $name) {
                 if (!$name) continue;
-
                 $subSlug = $alat->code_slug . '-sub-' . ($key + 1);
                 $subAlat = Alat::where('code_slug', $subSlug)->first();
-
                 if ($subAlat) {
                     $subAlat->update([
                         'name'          => $name,
@@ -146,7 +138,6 @@ class AlatController extends Controller
                         'created_at'    => now(),
                     ]);
                 }
-
                 BundleTool::create([
                     'bundle_id' => $alat->id,
                     'tool_id'   => $subAlat->id,
@@ -155,20 +146,18 @@ class AlatController extends Controller
             }
         }
 
+        // ← LOG
+        ActivityLog::log('update', 'alat', "Mengubah data alat: {$alat->name}");
+
         return redirect()->route('alat.tampil')->with('success', 'Data berhasil diperbarui!');
     }
 
-    /**
-     * Helper: hapus unit_conditions lalu tool_units untuk satu alat
-     */
     private function hapusUnits(Alat $alat)
     {
         $alat->load('units');
         foreach ($alat->units as $unit) {
-            // Hapus unit_conditions dulu (FK ke tool_units)
             UnitCondition::where('unit_code', $unit->code)->delete();
         }
-        // Baru hapus tool_units
         $alat->units()->delete();
     }
 
@@ -176,37 +165,29 @@ class AlatController extends Controller
     {
         $alat = Alat::with('bundleItems')->findOrFail($id);
 
-       
         BundleTool::where('bundle_id', $id)->delete();
 
-        
         if ($alat->item_type === 'bundle') {
             foreach ($alat->bundleItems as $subAlat) {
-                // Hapus bundle_tools yang mereferensikan sub-alat
-                BundleTool::where('bundle_id', $subAlat->id)
-                    ->orWhere('tool_id', $subAlat->id)
-                    ->delete();
-                // Hapus unit_conditions → tool_units → sub-alat
+                BundleTool::where('bundle_id', $subAlat->id)->orWhere('tool_id', $subAlat->id)->delete();
                 $this->hapusUnits($subAlat);
                 $subAlat->delete();
             }
         }
 
-       
         BundleTool::where('tool_id', $id)->delete();
-
-       
         $this->hapusUnits($alat);
 
-        // 5. Hapus foto
         if ($alat->photo_path && Storage::disk('public')->exists($alat->photo_path)) {
             Storage::disk('public')->delete($alat->photo_path);
         }
 
         
+        ActivityLog::log('delete', 'alat', "Menghapus alat: {$alat->name}");
+
         $alat->delete();
 
-        return redirect()->route('alat.tampil')->with('success', 'Alat dan relasinya berhasil dihapus!');
+        return redirect()->route('alat.tampil')->with('success', 'Alat berhasil dihapus!');
     }
 
     public function detail($id)

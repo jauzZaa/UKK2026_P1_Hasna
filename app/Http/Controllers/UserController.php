@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\UserDetail;
 use Illuminate\Http\Request;
@@ -12,9 +13,7 @@ class UserController extends Controller
     public function tampil()
     {
         $data = User::with('detail')
-            ->when(request('role'), function ($query) {
-                $query->where('role', request('role'));
-            })
+            ->when(request('role'), fn($q) => $q->where('role', request('role')))
             ->get();
         return view('user.tampil', compact('data'));
     }
@@ -52,6 +51,9 @@ class UserController extends Controller
             'birth_date' => $request->birth_date,
         ]);
 
+        // ← LOG
+        ActivityLog::log('create', 'user', "Menambah user: {$request->name} ({$request->role})");
+
         return redirect()->route('user.tampil')->with('success', 'User berhasil ditambahkan!');
     }
 
@@ -75,17 +77,13 @@ class UserController extends Controller
             'role'       => 'required|in:Admin,Employee,User',
         ]);
 
-        $user->update([
-            'email' => $request->email,
-            'role'  => $request->role,
-        ]);
+        $user->update(['email' => $request->email, 'role' => $request->role]);
 
         if ($request->filled('password')) {
             $user->update(['password' => Hash::make($request->password)]);
         }
 
         $detail = UserDetail::where('user_id', $user->id)->first();
-
         if ($detail) {
             $detail->update([
                 'name'       => $request->name,
@@ -104,14 +102,23 @@ class UserController extends Controller
             ]);
         }
 
+        // ← LOG
+        ActivityLog::log('update', 'user', "Mengubah data user: {$request->name} ({$user->role})");
+
         return redirect()->route('user.tampil')->with('success', 'User berhasil diupdate!');
     }
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('detail')->findOrFail($id);
+        $nama = $user->detail->name ?? $user->email;
+
+        
+        ActivityLog::log('delete', 'user', "Menghapus user: {$nama}");
+
         UserDetail::where('user_id', $user->id)->delete();
         $user->delete();
+
         return redirect()->route('user.tampil')->with('success', 'User berhasil dihapus!');
     }
 }

@@ -18,18 +18,18 @@ class Peminjaman extends Model
         'loan_date',
         'due_date',
         'purpose',
-        'user_notes', // tambah ini (setelah bikin migration-nya)
+        'return_photo',
+        'user_notes', 
         'notes',
         'created_at',
     ];
 
-    // Relasi ke user peminjam (untuk blade: $p->user->detail)
+    // Relasi ke user peminjam 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
-    // Alias user (nama lama, bisa tetap dipakai)
+    
     public function peminjam()
     {
         return $this->belongsTo(User::class, 'user_id');

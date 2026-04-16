@@ -15,7 +15,21 @@
         <div class="card-body"> {{-- HEADER --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0"> {{ auth()->user()->role === 'User' ? 'Riwayat Peminjaman Saya' : 'Daftar Pengajuan Peminjaman' }} </h4> @if (auth()->user()->role === 'User') <a href="{{ route('peminjaman.tambah') }}" class="btn btn-sm btn-primary"> <i class="mdi mdi-plus"></i> Ajukan Peminjaman </a> @endif
-            </div> @if (session('success')) <div class="alert alert-success alert-dismissible fade show"> <i class="mdi mdi-check-circle me-1"></i> {{ session('success') }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button> </div> @endif {{-- FILTER TAB (khusus petugas) --}} @if (auth()->user()->role !== 'User') <style>
+            </div> 
+            @if (session('success')) 
+            <div class="alert alert-success alert-dismissible fade show"> 
+                <i class="mdi mdi-check-circle me-1"></i> {{ session('success') }} 
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button> 
+            </div> 
+            @endif
+            @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="mdi mdi-alert-circle me-1"></i> {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+            {{-- FILTER TAB (khusus petugas) --}}
+            <style>
                 .filter-tab {
                     display: inline-flex;
                     align-items: center;
@@ -143,13 +157,38 @@
                 .tab-closed.active .tab-count {
                     background: rgba(255, 255, 255, 0.25);
                 }
+
+                .tab-returning {
+                    background: #EFF6FF;
+                    color: #3B82F6;
+                    border: 1.5px solid #3B82F650;
+                }
+
+                .tab-returning.active {
+                    background: #3B82F6;
+                    color: #fff;
+                    border-color: #3B82F6;
+                    box-shadow: 0 2px 8px #3B82F655;
+                }
+
+                .tab-returning .tab-count {
+                    background: #3B82F6;
+                }
+
+                .tab-returning.active .tab-count {
+                    background: rgba(255, 255, 255, 0.25);
+                }
             </style>
-            <div class="d-flex gap-2 mb-3 flex-wrap"> @php $tabs = ['all' => 'Semua', 'pending' => 'Menunggu', 'active' => 'Disetujui', 'rejected' => 'Ditolak', 'closed' => 'Selesai']; $activeTab = request('status', 'all'); @endphp @foreach ($tabs as $key => $label) @php $count = $key !== 'all' ? $data->where('status', $key)->count() : $data->count(); $isActive = $activeTab === $key ? 'active' : ''; @endphp <a href="{{ request()->fullUrlWithQuery(['status' => $key]) }}" class="filter-tab tab-{{ $key }} {{ $isActive }}"> {{ $label }} <span class="tab-count">{{ $count }}</span> </a> @endforeach </div> @endif {{-- TABEL --}}
+            <div class="d-flex gap-2 mb-3 flex-wrap"> @php $tabs = ['all' => 'Semua', 'pending' => 'Menunggu', 'active' => 'Disetujui', 'rejected' => 'Ditolak', 'closed' => 'Selesai']; $activeTab = request('status', 'all'); @endphp @foreach ($tabs as $key => $label) @php $count = $key !== 'all' ? $data->where('status', $key)->count() : $data->count(); $isActive = $activeTab === $key ? 'active' : ''; @endphp <a href="{{ request()->fullUrlWithQuery(['status' => $key]) }}" class="filter-tab tab-{{ $key }} {{ $isActive }}"> {{ $label }} <span class="tab-count">{{ $count }}</span> </a> @endforeach </div> {{-- TABEL --}}
             <div class="table-responsive">
                 <table class="table table-striped table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>No</th> @if (auth()->user()->role !== 'User') <th>Peminjam</th> @endif <th>Alat</th>
+                            <th>No</th>
+                            @if (auth()->user()->role !== 'User')
+                            <th>Peminjam</th>
+                            @endif
+                            <th>Alat</th>
                             <th>Unit</th>
                             <th>Status</th>
                             <th>Tgl Pinjam</th>
@@ -165,9 +204,25 @@
                                 <div class="fw-semibold">{{ $p->alat->name ?? $p->tool->name ?? '-' }}</div> <small> @php $type = $p->alat->item_type ?? $p->tool->item_type ?? ''; @endphp @if ($type === 'bundle') <span class="badge bg-info text-dark">Bundle</span> @else <span class="badge bg-primary">Single</span> @endif </small>
                             </td>
                             <td><code>{{ $p->unit_code }}</code></td>
-                            <td> @php $statusConfig = [ 'pending' => ['bg-warning text-dark', 'mdi-clock-outline', 'Menunggu'], 'active' => ['bg-success', 'mdi-check', 'Disetujui'], 'rejected' => ['bg-danger', 'mdi-close', 'Ditolak'], 'closed' => ['bg-secondary', 'mdi-archive', 'Selesai'], ]; [$badgeClass, $icon, $statusLabel] = $statusConfig[$p->status] ?? ['bg-light text-dark', 'mdi-help', $p->status]; @endphp <span class="badge {{ $badgeClass }}"> <i class="mdi {{ $icon }}"></i> {{ $statusLabel }} </span> </td>
+                            <td> @php
+                                $statusConfig = [
+                                'pending' => ['bg-warning text-dark', 'mdi-clock-outline', 'Menunggu'],
+                                'active' => ['bg-success', 'mdi-check', 'Disetujui'],
+                                'returning' => ['bg-primary', 'mdi-arrow-left-circle', 'Dikembalikan'],
+                                'rejected' => ['bg-danger', 'mdi-close', 'Ditolak'],
+                                'closed' => ['bg-secondary', 'mdi-archive', 'Selesai'],
+                                ];
+                                [$badgeClass, $icon, $statusLabel] = $statusConfig[$p->status] ?? ['bg-light text-dark', 'mdi-help', $p->status];
+                                @endphp
+                                <span class="badge {{ $badgeClass }}">
+                                    <i class="mdi {{ $icon }}"></i> {{ $statusLabel }}
+                                </span>
+                            </td>
                             <td>{{ \Carbon\Carbon::parse($p->loan_date)->format('d M Y') }}</td>
-                            <td> {{ \Carbon\Carbon::parse($p->due_date)->format('d M Y') }} @if ($isLate) <br><span class="badge bg-danger"> Terlambat {{ \Carbon\Carbon::parse($p->due_date)->diffInDays(\Carbon\Carbon::today()) }} hari </span> @endif </td>
+                            <td> {{ \Carbon\Carbon::parse($p->due_date)->format('d M Y') }} @if ($isLate) <br>
+                                <span class="badge bg-danger"> Terlambat {{ \Carbon\Carbon::parse($p->due_date)->diffInDays(\Carbon\Carbon::today()) }} hari </span>
+                                @endif
+                            </td>
                             <td style="max-width:180px;"> <span title="{{ $p->purpose }}"> {{ \Illuminate\Support\Str::limit($p->purpose, 50) }} </span> </td> {{-- KOLOM AKSI --}}
                             <td> @if (auth()->user()->role === 'User') @if ($p->status === 'active') <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalKembali{{ $p->id }}"> <i class="mdi mdi-keyboard-return"></i> Kembalikan </button> @else <span class="text-muted small">—</span> @endif @elseif (auth()->user()->role === 'Admin') {{-- Admin: Setujui/Tolak jika pending + Edit + Hapus --}}
                                 <div class="d-flex gap-1 flex-wrap"> @if ($p->status === 'pending') <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalApprove{{ $p->id }}"> <i class="mdi mdi-check"></i> Setujui </button> <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalReject{{ $p->id }}"> <i class="mdi mdi-close"></i> Tolak </button> @endif <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $p->id }}"> <i class="mdi mdi-pencil"></i> Edit </button> <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalHapus{{ $p->id }}"> <i class="mdi mdi-delete"></i> Hapus </button> </div> @else {{-- Petugas biasa --}} @if ($p->status === 'pending') <div class="d-flex gap-1"> <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalApprove{{ $p->id }}"> <i class="mdi mdi-check"></i> Setujui </button> <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalReject{{ $p->id }}"> <i class="mdi mdi-close"></i> Tolak </button> </div> @else <span class="text-muted small">—</span> @endif @endif
@@ -259,5 +314,5 @@
             </div> {{ $data->links() }}
         </div>
     </div>
-</div> 
+</div>
 @endsection

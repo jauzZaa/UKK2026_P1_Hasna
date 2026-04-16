@@ -93,7 +93,7 @@
                             @enderror
                         </div>
 
-                        {{-- Tujuan --}}
+                       
                         <div class="mb-3">
                             <label class="form-label">Tujuan Peminjaman <span class="text-danger">*</span></label>
                             <textarea name="purpose"
@@ -107,7 +107,7 @@
 
                     </div>
 
-                    {{-- KOLOM KANAN --}}
+                   
                     <div class="col-md-6">
 
                         {{-- Info Alat --}}

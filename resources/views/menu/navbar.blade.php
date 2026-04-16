@@ -78,9 +78,17 @@
                         <span class="menu-item">Data Pengembalian</span>
                     </a>
                 </li> -->
-                @endif
+                <li class="{{ request()->routeIs('LogAktifitas.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('LogAktifitas.tampil') }}"
+                        class="{{ request()->routeIs('LogAktifitas.*') ? 'active' : '' }}">
+                        <i class="icon nav-icon" data-feather="bar-chart-2"></i>
+                        <span class="menu-item">Log Aktifitas</span>
+                    </a>
+                </li>
+               
+                    @endif
 
-                @if($role == 'employee')
+                    @if($role == 'employee')
                 <li class="menu-title">Menu</li>
                 <li class="{{ request()->routeIs('peminjaman.*') ? 'mm-active' : '' }}">
                     <a href="{{ route('peminjaman.tampil') }}" class="{{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">
@@ -117,6 +125,13 @@
                     <a href="{{ route('peminjaman.tampil') }}" class="{{ request()->routeIs('peminjaman.tampil', 'peminjaman.tambah', 'peminjaman.store') ? 'active' : '' }}">
                         <i class="icon nav-icon" data-feather="edit-3"></i>
                         <span class="menu-item">Pengajuan Peminjaman</span>
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('peminjaman.denda.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('peminjaman.denda') }}"
+                        class="{{ request()->routeIs('peminjaman.denda.*') ? 'active' : '' }}">
+                        <i class="icon nav-icon" data-feather="folder"></i>
+                        <span class="menu-item">Data Pengembalian</span>
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('peminjaman.riwayat') ? 'mm-active' : '' }}">

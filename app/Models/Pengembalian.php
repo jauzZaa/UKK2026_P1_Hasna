@@ -14,6 +14,7 @@ class Pengembalian extends Model
         'employee_id',
         'condition_id',
         'return_date',
+        'photo',
         'notes',
         'created_at',
     ];
@@ -26,11 +27,6 @@ class Pengembalian extends Model
     public function petugas()
     {
         return $this->belongsTo(User::class, 'employee_id');
-    }
-
-    public function kondisi()
-    {
-        return $this->belongsTo(UnitCondition::class, 'condition_id', 'id');
     }
 
     public function unitCondition()

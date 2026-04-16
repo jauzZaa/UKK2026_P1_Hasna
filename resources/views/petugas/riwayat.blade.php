@@ -42,7 +42,6 @@
                             <th>Kondisi</th>
                             <th>Tgl Pinjam</th>
                             <th>Tgl Kembali</th>
-                            <th>Catatan</th>
                         </tr>
                     </thead>
                     <tbody>

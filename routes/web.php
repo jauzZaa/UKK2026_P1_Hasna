@@ -11,6 +11,7 @@ use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\ToolUnitController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PengembalianController;
+use App\Http\Controllers\ActivityLogController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -96,6 +97,21 @@ Route::get('/pengembalian', [PengembalianController::class, 'index'])->name('pet
 Route::patch('/pengembalian/{peminjaman}/ajukan',[PengembalianController::class, 'ajukan'])->name('pengembalian.ajukan');
 Route::patch('/pengembalian/{peminjaman}/konfirmasi', [PengembalianController::class, 'konfirmasi'])
     ->name('pengembalian.konfirmasi');
-Route::get('/pengembalian/riwayat', [PengembalianController::class, 'riwayat'])
-    ->name('pengembalian.riwayat');
+Route::get('/pengembalian/riwayat', [PengembalianController::class, 'riwayat'])->name('pengembalian.riwayat');
+Route::patch('/pengembalian/konfirmasi/{peminjaman}', [PengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
+Route::patch('/pengembalian/konfirmasi-bayar/{peminjaman}', [PengembalianController::class, 'konfirmasiBayar'])->name('pengembalian.konfirmasi-bayar');
+Route::patch('/pengembalian/lapor-bayar/{peminjaman}', [PengembalianController::class, 'laporBayar'])->name('pengembalian.lapor-bayar');
+
+// User
+Route::get('/denda', [PengembalianController::class, 'dendaUser'])->name('peminjaman.denda');
+Route::patch('/peminjaman/{peminjaman}/lapor-bayar', [PengembalianController::class, 'laporBayar'])->name('pengembalian.laporBayar');
+
+// Petugas
+Route::get('/pengembalian/denda', [PengembalianController::class, 'dendaPetugas'])->name('pengembalian.denda');
+Route::patch('/pengembalian/{peminjaman}/konfirmasi-bayar', [PengembalianController::class, 'konfirmasiBayar'])->name('pengembalian.konfirmasiBayar');
+
+Route::get('/peminjaman/denda', [PengembalianController::class, 'dendaUser'])->name('peminjaman.denda');
+Route::patch('/pengembalian/lapor-bayar/{peminjaman}', [PengembalianController::class, 'laporBayar'])->name('pengembalian.lapor-bayar');
+
+Route::get('/log-aktifitas', [ActivityLogController::class, 'index'])->name('LogAktifitas.tampil');
 require __DIR__ . '/auth.php';

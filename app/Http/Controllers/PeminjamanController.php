@@ -15,11 +15,25 @@ class PeminjamanController extends Controller
     public function tampil()
     {
         $status = request('status', 'all');
-        $data = Peminjaman::with(['alat', 'unit', 'user.detail'])
-            ->when($status !== 'all', fn($q) => $q->where('status', $status))
-            ->orderByDesc('created_at')
-            ->paginate(15);
 
+        $query = Peminjaman::with(['alat', 'unit', 'user.detail'])
+            ->orderByDesc('created_at');
+
+        // Jika User → tampilkan milik sendiri, exclude closed
+        // Jika Admin/Employee → tampilkan semua, exclude closed
+        $query->whereNotIn('status', ['closed']);
+
+        // Filter per status tab (kecuali 'all')
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // User hanya lihat milik sendiri
+        if (Auth::user()->role === 'User') {
+            $query->where('user_id', Auth::id());
+        }
+
+        $data = $query->paginate(15);
         $alat = Alat::orderBy('name')->get();
 
         return view('peminjaman.tampil', compact('data', 'alat'));
@@ -65,18 +79,17 @@ class PeminjamanController extends Controller
         ]);
 
         $peminjaman = Peminjaman::create([
-            'user_id'   => Auth::id(),
-            'tool_id'   => $request->tool_id,
-            'unit_code' => $request->unit_code,
-            'status'    => 'pending',
-            'loan_date' => $request->loan_date,
-            'due_date'  => $request->due_date,
-            'purpose'   => $request->purpose,
-            'notes'     => $request->notes,
+            'user_id'    => Auth::id(),
+            'tool_id'    => $request->tool_id,
+            'unit_code'  => $request->unit_code,
+            'status'     => 'pending',
+            'loan_date'  => $request->loan_date,
+            'due_date'   => $request->due_date,
+            'purpose'    => $request->purpose,
+            'notes'      => $request->notes,
             'created_at' => now(),
         ]);
 
-        // ← LOG
         ActivityLog::log('create', 'peminjaman', "Mengajukan peminjaman alat: {$peminjaman->alat->name} (Unit: {$peminjaman->unit_code})");
 
         return redirect()->route('peminjaman.tampil')
@@ -95,7 +108,6 @@ class PeminjamanController extends Controller
 
         ToolUnit::where('code', $peminjaman->unit_code)->update(['status' => 'lent']);
 
-        // ← LOG
         ActivityLog::log('approve', 'peminjaman', "Menyetujui peminjaman ID: {$peminjaman->id} (Unit: {$peminjaman->unit_code})");
 
         return redirect()->route('peminjaman.tampil')
@@ -116,7 +128,6 @@ class PeminjamanController extends Controller
             'notes'       => $request->notes,
         ]);
 
-        // ← LOG
         ActivityLog::log('reject', 'peminjaman', "Menolak peminjaman ID: {$peminjaman->id} (Unit: {$peminjaman->unit_code})");
 
         return redirect()->route('peminjaman.tampil')
@@ -125,8 +136,10 @@ class PeminjamanController extends Controller
 
     public function riwayat()
     {
+        // Riwayat = hanya status closed milik user yang login
         $data = Peminjaman::with(['alat', 'unit'])
             ->where('user_id', Auth::id())
+            ->where('status', 'closed')
             ->orderByDesc('created_at')
             ->paginate(15);
 
@@ -154,10 +167,9 @@ class PeminjamanController extends Controller
             'due_date',
             'purpose',
             'status',
-            'notes'
+            'notes',
         ]));
 
-        
         ActivityLog::log('update', 'peminjaman', "Mengubah data peminjaman ID: {$peminjaman->id}");
 
         return redirect()->route('peminjaman.tampil')
@@ -172,7 +184,6 @@ class PeminjamanController extends Controller
             ToolUnit::where('code', $peminjaman->unit_code)->update(['status' => 'available']);
         }
 
-        // ← LOG
         ActivityLog::log('delete', 'peminjaman', "Menghapus peminjaman ID: {$peminjaman->id} (Unit: {$peminjaman->unit_code})");
 
         $peminjaman->delete();

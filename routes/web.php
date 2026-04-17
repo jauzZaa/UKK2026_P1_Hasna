@@ -114,4 +114,11 @@ Route::get('/peminjaman/denda', [PengembalianController::class, 'dendaUser'])->n
 Route::patch('/pengembalian/lapor-bayar/{peminjaman}', [PengembalianController::class, 'laporBayar'])->name('pengembalian.lapor-bayar');
 
 Route::get('/log-aktifitas', [ActivityLogController::class, 'index'])->name('LogAktifitas.tampil');
+
+Route::get('/user/export', [UserController::class, 'exportExcel'])->name('user.export');
+Route::get('/kategori/export', [CategoryController::class, 'exportExcel'])->name('kategori.export');
+Route::get('/lokasi/export', [LokasiController::class, 'exportExcel'])->name('lokasi.export');
+Route::get('/alat/export', [AlatController::class, 'exportExcel'])->name('alat.export');
+Route::get('/unit/export', [ToolUnitController::class, 'exportExcel'])->name('unit.export');
+Route::get('/pengembalian/export', [PengembalianController::class, 'exportExcel'])->name('pengembalian.export');
 require __DIR__ . '/auth.php';

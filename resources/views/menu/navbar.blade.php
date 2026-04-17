@@ -71,13 +71,13 @@
                         <span class="menu-item">Data Peminjaman</span>
                     </a>
                 </li>
-                <!-- <li class="{{ request()->routeIs('petugas.pengembalian.*') ? 'mm-active' : '' }}">
-                    <a href="{{ route('petugas.pengembalian') }}"
-                        class="{{ request()->routeIs('petugas.pengembalian.*') ? 'active' : '' }}">
-                        <i class="icon nav-icon" data-feather="folder"></i>
-                        <span class="menu-item">Data Pengembalian</span>
+                <li class="{{ request()->routeIs('pengembalian.riwayat') ? 'mm-active' : '' }}">
+                    <a href="{{ route('pengembalian.riwayat') }}"
+                        class="{{ request()->routeIs('pengembalian.riwayat') ? 'active' : '' }}">
+                        <i class="icon nav-icon" data-feather="file-text"></i>
+                        <span class="menu-item">Riwayat Pengembalian</span>
                     </a>
-                </li> -->
+                </li>
                 <li class="{{ request()->routeIs('LogAktifitas.*') ? 'mm-active' : '' }}">
                     <a href="{{ route('LogAktifitas.tampil') }}"
                         class="{{ request()->routeIs('LogAktifitas.*') ? 'active' : '' }}">
@@ -85,10 +85,10 @@
                         <span class="menu-item">Log Aktifitas</span>
                     </a>
                 </li>
-               
-                    @endif
 
-                    @if($role == 'employee')
+                @endif
+
+                @if($role == 'employee')
                 <li class="menu-title">Menu</li>
                 <li class="{{ request()->routeIs('peminjaman.*') ? 'mm-active' : '' }}">
                     <a href="{{ route('peminjaman.tampil') }}" class="{{ request()->routeIs('peminjaman.*') ? 'active' : '' }}">

@@ -21,7 +21,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0">Tampil Data Kategori</h4>
                 <div>
-                    <a href="#" class="btn btn-sm btn-secondary-subtle">
+                    <a href="{{ route('kategori.export') }}" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
                     </a>
                     <a href="{{ route('category.tambah') }}" class="btn btn-sm btn-primary ms-2">

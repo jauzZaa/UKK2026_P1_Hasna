@@ -23,7 +23,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0">Tampil Data Alat</h4>
                 <div>
-                    <a href="#" class="btn btn-sm btn-secondary-subtle">
+                    <a href="{{ route('alat.export') }}" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
                     </a>
                     @if($role == 'admin')

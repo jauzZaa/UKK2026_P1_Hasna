@@ -22,6 +22,11 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0">Riwayat Semua Pengembalian</h4>
+                <div>
+                    <a href="{{ route('pengembalian.export') }}" class="btn btn-sm btn-secondary-subtle">
+                        Print <i class="mdi mdi-printer align-middle"></i>
+                    </a>
+                </div>
             </div>
 
             @if (session('success'))

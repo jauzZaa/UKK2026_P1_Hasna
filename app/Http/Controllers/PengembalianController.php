@@ -7,12 +7,20 @@ use App\Models\Peminjaman;
 use App\Models\Pengembalian;
 use App\Models\ToolUnit;
 use App\Models\UnitCondition;
+use App\Exports\PengembalianExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class PengembalianController extends Controller
 {
+
+    public function exportExcel()
+    {
+        return Excel::download(new PengembalianExport, 'riwayat_pengembalian.xlsx');
+    }
+
     public function index()
     {
         $dataReturning = Peminjaman::with(['peminjam.detail', 'alat', 'unit'])

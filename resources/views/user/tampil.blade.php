@@ -30,7 +30,7 @@
                         <option value="Employee" {{ request('role') == 'Employee' ? 'selected' : '' }}>Employee</option>
                         <option value="User" {{ request('role') == 'User' ? 'selected' : '' }}>User</option>
                     </select>
-                    <a href="#" class="btn btn-sm btn-secondary-subtle">
+                    <a href="{{ route('user.export') }}" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
                     </a>
                     <a href="{{ route('user.tambah') }}" class="btn btn-sm btn-primary">

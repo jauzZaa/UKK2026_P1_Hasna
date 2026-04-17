@@ -7,10 +7,18 @@ use App\Models\ToolUnit;
 use App\Models\UnitCondition;
 use App\Models\Alat;
 use Illuminate\Http\Request;
+use App\Exports\UnitExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 
 class ToolUnitController extends Controller
 {
+
+    public function exportExcel()
+    {
+        return Excel::download(new UnitExport, 'data_unit.xlsx');
+    }
+
     public function store(Request $request)
     {
         $request->validate([

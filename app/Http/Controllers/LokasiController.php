@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Lokasi;
+use App\Exports\LokasiExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
 class LokasiController extends Controller
 {
+
+    public function exportExcel()
+    {
+        return Excel::download(new LokasiExport, 'data_lokasi.xlsx');
+    }
+
     public function tampil()
     {
         $data = Lokasi::all();

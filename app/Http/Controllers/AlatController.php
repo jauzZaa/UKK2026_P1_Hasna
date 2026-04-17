@@ -8,11 +8,19 @@ use App\Models\Category;
 use App\Models\Lokasi;
 use App\Models\BundleTool;
 use App\Models\UnitCondition;
+use App\Exports\AlatExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class AlatController extends Controller
 {
+
+    public function exportExcel()
+    {
+        return Excel::download(new AlatExport, 'data_alat.xlsx');
+    }
+
     public function tampil()
     {
         $data = Alat::with(['category', 'lokasi', 'bundleItems'])

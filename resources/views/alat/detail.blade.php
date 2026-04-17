@@ -95,9 +95,14 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="card-title mb-0">Daftar Unit Alat</h4>
                 @if($role == 'admin')
-                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalTambahUnit">
-                    <i class="mdi mdi-plus"></i> Tambah Unit
-                </button>
+                <div>
+                    <a href="{{ route('unit.export') }}" class="btn btn-sm btn-secondary-subtle">
+                        Print <i class="mdi mdi-printer align-middle"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalTambahUnit">
+                        <i class="mdi mdi-plus"></i> Tambah Unit
+                    </button>
+                </div>
                 @endif
             </div>
 
@@ -182,6 +187,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+
                 <h5 class="modal-title">Tambah Unit Alat</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>

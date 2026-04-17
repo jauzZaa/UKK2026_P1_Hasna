@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Category;
+use App\Exports\KategoriExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+
+    public function exportExcel()
+    {
+        return Excel::download(new KategoriExport, 'data_kategori.xlsx');
+    }
+
     public function tampil()
     {
         $data = Category::all();

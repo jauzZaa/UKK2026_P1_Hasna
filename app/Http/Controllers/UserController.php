@@ -6,10 +6,18 @@ use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\UserDetail;
 use Illuminate\Http\Request;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+
+    public function exportExcel()
+    {
+        return Excel::download(new UsersExport, 'data_user.xlsx');
+    }
+
     public function tampil()
     {
         $data = User::with('detail')

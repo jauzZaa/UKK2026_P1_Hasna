@@ -51,6 +51,13 @@
                             </div>
                             <form class="form" action="{{ route('login') }}" method="POST">
                                 @csrf
+                                @if ($errors->any())
+                                <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                                    <i class="mdi mdi-alert-circle me-1"></i>
+                                    {{ $errors->first('email') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                @endif
                                 <div class="form-floating form-floating-custom mb-3">
                                     <input type="email" class="form-control" id="input-email" placeholder="Enter Email" name="email" value=" {{ old('email') }}">
                                     <label for="input-email">Email</label>
@@ -58,7 +65,7 @@
                                         <i class="uil uil-users-alt"></i>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-floating form-floating-custom mb-3">
                                     <input type="password" class="form-control" id="password" placeholder="Enter Password" name="password">
                                     <label for="password">Password</label>
@@ -74,7 +81,7 @@
                                     </label>
                                 </div>
 
-                                 
+
                                 <div class="mt-3">
                                     <button type="submit" class="btn btn-info w-100">Log In</button>
                                 </div>

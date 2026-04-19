@@ -75,7 +75,13 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
 
-        // ← LOG (sebelum delete)
+     
+        if ($category->alat()->count() > 0) {
+            return redirect()->route('category.tampil')
+                ->with('error', 'Kategori tidak bisa dihapus karena sudah digunakan oleh ' . $category->alat()->count() . ' alat.');
+        }
+
+        
         ActivityLog::log('delete', 'category', "Menghapus kategori: {$category->name}");
 
         $category->delete();

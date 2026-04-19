@@ -19,8 +19,6 @@ class PeminjamanController extends Controller
         $query = Peminjaman::with(['alat', 'unit', 'user.detail'])
             ->orderByDesc('created_at');
 
-        // Jika User → tampilkan milik sendiri, exclude closed
-        // Jika Admin/Employee → tampilkan semua, exclude closed
         $query->whereNotIn('status', ['closed']);
 
         // Filter per status tab (kecuali 'all')
@@ -28,7 +26,6 @@ class PeminjamanController extends Controller
             $query->where('status', $status);
         }
 
-        // User hanya lihat milik sendiri
         if (Auth::user()->role === 'User') {
             $query->where('user_id', Auth::id());
         }
@@ -50,6 +47,15 @@ class PeminjamanController extends Controller
                 ->with('error', 'Anda masih memiliki denda yang belum diselesaikan.');
         }
 
+        $masihAktif = Peminjaman::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'active'])
+            ->exists();
+
+        if ($masihAktif) {
+            return redirect()->route('peminjaman.tampil')
+                ->with('error', 'Kamu masih memiliki peminjaman yang belum selesai. Kembalikan alat terlebih dahulu.');
+        }
+
         $alat = Alat::whereIn('item_type', ['single', 'bundle'])
             ->whereHas('units', function ($q) {
                 $q->where('status', 'available');
@@ -69,6 +75,16 @@ class PeminjamanController extends Controller
 
     public function store(Request $request)
     {
+
+        $masihAktif = Peminjaman::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'active'])
+            ->exists();
+
+        if ($masihAktif) {
+            return redirect()->route('peminjaman.tampil')
+                ->with('error', 'Kamu masih memiliki peminjaman yang belum selesai. Kembalikan alat terlebih dahulu.');
+        }
+
         $request->validate([
             'tool_id'   => 'required|exists:tools,id',
             'unit_code' => 'required|exists:tool_units,code',

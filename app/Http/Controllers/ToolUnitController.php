@@ -85,4 +85,33 @@ class ToolUnitController extends Controller
 
         return redirect()->route('alat.detail', $unit->tool_id)->with('success', 'Unit berhasil diupdate!');
     }
+
+    public function destroy($code)
+{
+    $unit = ToolUnit::where('code', $code)->firstOrFail();
+
+    if ($unit->status === 'lent') {
+        return redirect()->back()
+            ->with('error', 'Unit tidak bisa dihapus karena sedang dipinjam.');
+    }
+
+    $activeLoan = \App\Models\Peminjaman::where('unit_code', $code)
+        ->whereNotIn('status', ['closed', 'rejected'])
+        ->exists();
+
+    if ($activeLoan) {
+        return redirect()->back()
+            ->with('error', 'Unit tidak bisa dihapus karena masih dalam proses peminjaman.');
+    }
+
+    UnitCondition::where('unit_code', $code)->delete();
+
+    ActivityLog::log('delete', 'tool_unit', "Menghapus unit: {$code}");
+
+    $toolId = $unit->tool_id;
+    $unit->delete();
+
+    return redirect()->route('alat.detail', $toolId)
+        ->with('success', 'Unit berhasil dihapus.');
+}
 }

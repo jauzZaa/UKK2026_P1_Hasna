@@ -22,6 +22,13 @@
 
 <div class="col-lg-12">
 
+    @if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="mdi mdi-alert-circle me-1"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
+
     @if (session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif

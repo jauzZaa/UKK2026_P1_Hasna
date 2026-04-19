@@ -16,4 +16,9 @@ class Lokasi extends Model
         'name',
         'detail',
     ];
+
+    public function alat()
+    {
+        return $this->hasMany(Alat::class, 'location_code', 'location_code');
+    }
 }

@@ -77,7 +77,11 @@ class LokasiController extends Controller
     {
         $lokasi = Lokasi::findOrFail($location_code);
 
-        // ← LOG (sebelum delete)
+        if ($lokasi->alat()->count() > 0) {
+            return redirect()->route('lokasi.tampil')
+                ->with('error', 'Lokasi tidak bisa dihapus karena sudah digunakan oleh ' . $lokasi->alat()->count() . ' alat.');
+        }
+
         ActivityLog::log('delete', 'lokasi', "Menghapus lokasi: {$lokasi->name} ({$lokasi->location_code})");
 
         $lokasi->delete();

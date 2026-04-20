@@ -24,7 +24,6 @@ class Peminjaman extends Model
         'created_at',
     ];
 
-    // Relasi ke user peminjam 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

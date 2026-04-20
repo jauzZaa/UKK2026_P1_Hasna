@@ -78,6 +78,13 @@
                         <span class="menu-item">Riwayat Pengembalian</span>
                     </a>
                 </li>
+                <li class="{{ request()->routeIs('laporan.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('laporan.tampil') }}"
+                        class="{{ request()->routeIs('laporan.tampil') ? 'active' : '' }}">
+                        <i class="icon nav-icon" data-feather="file-text"></i>
+                        <span class="menu-item">Cetak Laporan</span>
+                    </a>
+                </li>
                 <li class="{{ request()->routeIs('LogAktifitas.*') ? 'mm-active' : '' }}">
                     <a href="{{ route('LogAktifitas.tampil') }}"
                         class="{{ request()->routeIs('LogAktifitas.*') ? 'active' : '' }}">

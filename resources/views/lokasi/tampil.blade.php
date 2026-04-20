@@ -19,12 +19,28 @@
     <div class="card">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="card-title mb-0">Data Peminjaman</h4>
-                <div>
+                <h4 class="card-title mb-0">Tampil Data Lokasi</h4>
+                <div class="d-flex gap-2 align-items-center">
+                    <form method="GET" action="{{ route('lokasi.tampil') }}" class="d-flex">
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Cari lokasi..."
+                                value="{{ request('search') }}"
+                                style="width: 200px;">
+                            <button type="submit" class="btn btn-secondary-subtle">
+                                <i class="mdi mdi-magnify"></i>
+                            </button>
+                            @if(request('search'))
+                            <a href="{{ route('lokasi.tampil') }}" class="btn btn-outline-secondary">
+                                <i class="mdi mdi-close"></i>
+                            </a>
+                            @endif
+                        </div>
+                    </form>
                     <a href="{{ route('lokasi.export') }}" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
                     </a>
-                    <a href="{{ route('lokasi.tambah') }}" class="btn btn-sm btn-primary ms-2">
+                    <a href="{{ route('lokasi.tambah') }}" class="btn btn-sm btn-primary">
                         Tambah <i class="mdi mdi-plus align-middle"></i>
                     </a>
                 </div>

@@ -20,9 +20,28 @@
     <div class="card">
         <div class="card-body">
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <h4 class="card-title mb-0">Riwayat Semua Pengembalian</h4>
-                <div>
+
+                <div class="d-flex gap-2 align-items-center ms-auto">
+                   
+                    <form method="GET" action="{{ route('pengembalian.riwayat') }}">
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="search" class="form-control"
+                                placeholder="Cari alat / peminjam..."
+                                value="{{ request('search') }}"
+                                style="width: 200px;">
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="mdi mdi-magnify"></i>
+                            </button>
+                            @if(request('search'))
+                            <a href="{{ route('pengembalian.riwayat') }}" class="btn btn-outline-secondary">
+                                <i class="mdi mdi-close"></i>
+                            </a>
+                            @endif
+                        </div>
+                    </form>
+
                     <a href="{{ route('pengembalian.export') }}" class="btn btn-sm btn-secondary-subtle">
                         Print <i class="mdi mdi-printer align-middle"></i>
                     </a>

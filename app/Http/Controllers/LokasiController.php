@@ -18,7 +18,13 @@ class LokasiController extends Controller
 
     public function tampil()
     {
-        $data = Lokasi::all();
+        $data = Lokasi::when(request('search'), function ($query) {
+            $query->where('location_code', 'like', '%' . request('search') . '%')
+                ->orWhere('name', 'like', '%' . request('search') . '%')
+                ->orWhere('detail', 'like', '%' . request('search') . '%');
+        })
+            ->get();
+
         return view('lokasi.tampil', compact('data'));
     }
 

@@ -15,10 +15,22 @@
     </div>
 </div>
 
+@php $filterUrl = route('LogAktifitas.tampil'); @endphp
+
 <div class="col-lg-12">
     <div class="card">
         <div class="card-body">
-            <h4 class="card-title mb-3">Riwayat Aktifitas Sistem</h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="card-title mb-0">Riwayat Aktifitas Sistem</h4>
+                <select class="form-select form-select-sm" style="width: 150px;"
+                    onchange="window.location.href='{{ $filterUrl }}?role='+this.value">
+                    <option value="">Semua Role</option>
+                    <option value="Admin" {{ request('role') == 'Admin'    ? 'selected' : '' }}>Admin</option>
+                    <option value="Employee" {{ request('role') == 'Employee' ? 'selected' : '' }}>Employee</option>
+                    <option value="User" {{ request('role') == 'User'     ? 'selected' : '' }}>User</option>
+                </select>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-striped table-bordered align-middle">
                     <thead class="table-light">
@@ -51,13 +63,13 @@
                             <td>
                                 @php
                                 $actionConfig = [
-                                    'create'  => ['bg-success', 'mdi-plus-circle'],
-                                    'update'  => ['bg-warning text-dark', 'mdi-pencil'],
-                                    'delete'  => ['bg-danger', 'mdi-delete'],
-                                    'approve' => ['bg-success', 'mdi-check-circle'],
-                                    'reject'  => ['bg-danger', 'mdi-close-circle'],
-                                    'login'   => ['bg-info', 'mdi-login'],
-                                    'logout'  => ['bg-secondary', 'mdi-logout'],
+                                'create' => ['bg-success', 'mdi-plus-circle'],
+                                'update' => ['bg-warning text-dark', 'mdi-pencil'],
+                                'delete' => ['bg-danger', 'mdi-delete'],
+                                'approve' => ['bg-success', 'mdi-check-circle'],
+                                'reject' => ['bg-danger', 'mdi-close-circle'],
+                                'login' => ['bg-info', 'mdi-login'],
+                                'logout' => ['bg-secondary', 'mdi-logout'],
                                 ];
                                 [$badge, $icon] = $actionConfig[$log->action] ?? ['bg-light text-dark', 'mdi-help'];
                                 @endphp

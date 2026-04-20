@@ -22,7 +22,6 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        // ← LOG
         ActivityLog::log('login', 'auth', 'User login ke sistem');
 
         $role = strtolower(auth()->user()->role);
@@ -32,14 +31,12 @@ class AuthenticatedSessionController extends Controller
         } elseif ($role === 'employee') {
             return redirect()->route('peminjaman.tampil');
         } else {
-            // Admin masuk sini
             return redirect()->route('dashboard');
         }
     }
 
     public function destroy(Request $request): RedirectResponse
     {
-        // ← LOG (sebelum logout)
         ActivityLog::log('logout', 'auth', 'User logout dari sistem');
 
         Auth::guard('web')->logout();

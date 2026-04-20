@@ -25,7 +25,17 @@ class AlatController extends Controller
     {
         $data = Alat::with(['category', 'lokasi', 'bundleItems'])
             ->where('item_type', '!=', 'bundle_tool')
+            ->when(request('search'), function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . request('search') . '%')
+                        ->orWhere('code_slug', 'like', '%' . request('search') . '%')
+                        ->orWhereHas('category', function ($q2) {
+                            $q2->where('name', 'like', '%' . request('search') . '%');
+                        });
+                });
+            })
             ->get();
+
         return view('alat.tampil', compact('data'));
     }
 

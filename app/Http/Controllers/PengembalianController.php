@@ -96,7 +96,6 @@ class PengembalianController extends Controller
             ToolUnit::where('code', $peminjaman->unit_code)->update(['status' => $newStatus]);
         }
 
-        // ← LOG
         ActivityLog::log('update', 'pengembalian', "Konfirmasi pengembalian ID: {$peminjaman->id}, kondisi: {$request->conditions}");
 
         return redirect()->route('petugas.pengembalian')
@@ -110,7 +109,7 @@ class PengembalianController extends Controller
 
         $peminjaman->update(['status' => 'fine_pending']);
 
-        // ← LOG
+        
         ActivityLog::log('update', 'pengembalian', "Lapor bayar denda peminjaman ID: {$peminjaman->id}");
 
         return redirect()->route('peminjaman.denda')
@@ -123,7 +122,7 @@ class PengembalianController extends Controller
 
         $peminjaman->update(['status' => 'closed']);
 
-        // ← LOG
+        
         ActivityLog::log('approve', 'pengembalian', "Konfirmasi bayar denda peminjaman ID: {$peminjaman->id}");
 
         return redirect()->route('pengembalian.denda')
@@ -152,8 +151,17 @@ class PengembalianController extends Controller
 
     public function riwayat()
     {
+        $search = request('search');
+
         $data = Peminjaman::with(['alat', 'unit', 'user.detail', 'pengembalian.unitCondition'])
-            ->where('status', 'closed')->paginate(15);
+            ->where('status', 'closed')
+            ->when($search, function ($q) use ($search) {
+                $q->whereHas('alat', fn($q) => $q->where('name', 'like', "%$search%"))
+                    ->orWhereHas('user.detail', fn($q) => $q->where('name', 'like', "%$search%"))
+                    ->orWhere('unit_code', 'like', "%$search%");
+            })
+            ->paginate(15);
+
         return view('petugas.riwayat', compact('data'));
     }
 }

@@ -18,7 +18,12 @@ class CategoryController extends Controller
 
     public function tampil()
     {
-        $data = Category::all();
+        $data = Category::when(request('search'), function ($query) {
+            $query->where('name', 'like', '%' . request('search') . '%')
+                ->orWhere('description', 'like', '%' . request('search') . '%');
+        })
+            ->get();
+
         return view('category.tampil', compact('data'));
     }
 
@@ -65,7 +70,6 @@ class CategoryController extends Controller
             'description' => $request->description,
         ]);
 
-        // ← LOG
         ActivityLog::log('update', 'category', "Mengubah kategori: {$category->name}");
 
         return redirect()->route('category.tampil')->with('success', 'Kategori berhasil diupdate!');

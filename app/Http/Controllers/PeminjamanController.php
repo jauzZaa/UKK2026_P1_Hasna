@@ -21,7 +21,6 @@ class PeminjamanController extends Controller
 
         $query->whereNotIn('status', ['closed']);
 
-        // Filter per status tab (kecuali 'all')
         if ($status !== 'all') {
             $query->where('status', $status);
         }
@@ -30,9 +29,20 @@ class PeminjamanController extends Controller
             $query->where('user_id', Auth::id());
         }
 
-        $data = $query->paginate(15);
-        $alat = Alat::orderBy('name')->get();
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('alat', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })->orWhereHas('peminjam.detail', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })->orWhere('unit_code', 'like', "%{$search}%");
+            });
+        }
 
+        $data = $query->orderByDesc('created_at')->paginate(15)->withQueryString();
+        $alat = \App\Models\Alat::all();
+        
         return view('peminjaman.tampil', compact('data', 'alat'));
     }
 

@@ -23,15 +23,25 @@ class PengembalianController extends Controller
 
     public function index()
     {
+        $search = request('search');
+
         $dataReturning = Peminjaman::with(['peminjam.detail', 'alat', 'unit'])
-            ->where('status', 'returning')->orderByDesc('created_at')->get();
+            ->where('status', 'returning')
+            ->when($search, function ($q) use ($search) {
+                $q->whereHas('peminjam.detail', fn($q) => $q->where('name', 'like', "%$search%"))
+                    ->orWhereHas('alat', fn($q) => $q->where('name', 'like', "%$search%"))
+                    ->orWhere('unit_code', 'like', "%$search%");
+            })
+            ->orderByDesc('created_at')
+            ->get();
 
         $dataDenda = Peminjaman::with(['peminjam.detail', 'alat', 'unit', 'pengembalian'])
-            ->whereIn('status', ['fined', 'fine_pending'])->orderByDesc('created_at')->get();
+            ->whereIn('status', ['fined', 'fine_pending'])
+            ->orderByDesc('created_at')
+            ->get();
 
         return view('petugas.pengembalian', compact('dataReturning', 'dataDenda'));
     }
-
     public function ajukan(Request $request, Peminjaman $peminjaman)
     {
         abort_if($peminjaman->user_id !== Auth::id(), 403);
@@ -164,4 +174,6 @@ class PengembalianController extends Controller
 
         return view('petugas.riwayat', compact('data'));
     }
+
+    
 }

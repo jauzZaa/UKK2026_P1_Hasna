@@ -12,6 +12,7 @@ use App\Http\Controllers\ToolUnitController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PengembalianController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\CetakLaporanController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -121,4 +122,9 @@ Route::get('/lokasi/export', [LokasiController::class, 'exportExcel'])->name('lo
 Route::get('/alat/export', [AlatController::class, 'exportExcel'])->name('alat.export');
 Route::get('/unit/export', [ToolUnitController::class, 'exportExcel'])->name('unit.export');
 Route::get('/pengembalian/export', [PengembalianController::class, 'exportExcel'])->name('pengembalian.export');
+
+Route::get('/laporan/peminjam', [CetakLaporanController::class, 'tampil'])->name('laporan.tampil');
+Route::get('/laporan/peminjam/{id}', [CetakLaporanController::class, 'detail'])->name('laporan.detail');
+Route::get('/laporan/export', [CetakLaporanController::class, 'exportLaporan'])->name('laporan.export');
+Route::get('/laporan/export/{id}', [CetakLaporanController::class, 'exportDetail'])->name('laporan.exportDetail');
 require __DIR__ . '/auth.php';
